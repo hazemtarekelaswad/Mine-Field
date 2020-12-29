@@ -74,7 +74,7 @@ LOCAL DRAW_WID, DRAW_LEN, DRAW_HEIGHT, RIGHT, TOP
     MOV DX, Y           ; Y-Pos
     MOV AX, 0C0EH       ; AH: Draw Pixel | AL: Color
 
-    DRAW_RECT X, Y, LEN, WID
+    DRAW_RECT X, Y, LEN, HEIGHT
 
     MOV BX, DX
     MOV SI, WID
@@ -119,7 +119,7 @@ MAIN PROC FAR
     MOV AX, 0013H
     INT 10H
 
-    DRAW_CUBOID 100, 100, 10, 10, 10
+    DRAW_CUBOID 100, 100, 20, 10, 15
     
     MOV AH, 4CH
     INT 21H

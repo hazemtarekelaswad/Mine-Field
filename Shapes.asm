@@ -67,6 +67,30 @@ LOCAL DRAW_WID, DRAW_LEN
 
 ENDM
 
+DRAW_FILLED_RECT MACRO X, Y, LEN, WID
+LOCAL DRAW_WID, DRAW_LEN, FILL
+    MOV CX, X           ; X-Pos
+    MOV DX, Y           ; Y-Pos
+    MOV AX, 0C0EH       ; AH: Draw Pixel | AL: Color
+
+    ; Draw the right and left sides
+    MOV BX, WID
+    ADD BX, DX
+    DRAW_WID:
+        INT 10H
+        MOV DI, CX
+        ADD DI, LEN
+        FILL:
+            INC CX
+            INT 10H
+            CMP CX, DI
+        JNE FILL
+        SUB CX, LEN
+        INC DX
+        CMP DX, BX
+    JNE DRAW_WID
+ENDM
+
 DRAW_CUBOID MACRO X, Y, LEN, WID, HEIGHT
 LOCAL DRAW_WID, DRAW_LEN, DRAW_HEIGHT, RIGHT, TOP
 
@@ -87,10 +111,10 @@ LOCAL DRAW_WID, DRAW_LEN, DRAW_HEIGHT, RIGHT, TOP
         INT 10H
         SUB CX, LEN
         INT 10H
-        INC CX
-        DEC DX
         ADD CX, LEN
         ADD DX, HEIGHT
+        INC CX
+        DEC DX
         CMP DX, BX
     JNE DRAW_WID
 
@@ -113,13 +137,55 @@ LOCAL DRAW_WID, DRAW_LEN, DRAW_HEIGHT, RIGHT, TOP
 
 ENDM
 
+DRAW_FILLED_CUBOID MACRO X, Y, LEN, WID, HEIGHT
+LOCAL DRAW_WID, DRAW_LEN, DRAW_HEIGHT, RIGHT, TOP, FILL
+
+    MOV CX, X           ; X-Pos
+    MOV DX, Y           ; Y-Pos
+    MOV AX, 0C0EH       ; AH: Draw Pixel | AL: Color
+
+    DRAW_FILLED_RECT X, Y, LEN, HEIGHT
+
+    ADD CX, LEN
+    DEC DX
+
+    MOV BX, DX
+    MOV SI, WID
+    SHR SI, 1
+    SUB BX, SI
+
+    DRAW_WID:
+        INT 10H
+        MOV DI, DX
+        SUB DI, HEIGHT
+        FILL_HEIGHT:
+            DEC DX
+            INT 10H
+            CMP DX, DI
+        JNE FILL_HEIGHT
+
+        MOV DI, CX
+        SUB DI, LEN
+        FILL_LEN:
+            DEC CX
+            INT 10H
+            CMP CX, DI
+        JNE FILL_LEN
+        ADD CX, LEN
+        ADD DX, HEIGHT
+        INC CX
+        DEC DX
+        CMP DX, BX
+    JNE DRAW_WID
+ENDM
 MAIN PROC FAR
   
 ; Change to video mode
     MOV AX, 0013H
     INT 10H
 
-    DRAW_CUBOID 100, 100, 20, 10, 15
+    ;DRAW_FILLED_RECT 30, 100, 20, 10
+    DRAW_FILLED_CUBOID 100, 100, 20, 10, 15
     
     MOV AH, 4CH
     INT 21H

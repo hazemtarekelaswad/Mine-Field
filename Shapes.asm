@@ -138,23 +138,28 @@ LOCAL DRAW_WID, DRAW_LEN, DRAW_HEIGHT, RIGHT, TOP
 ENDM
 
 DRAW_FILLED_CUBOID MACRO X, Y, LEN, WID, HEIGHT
-LOCAL DRAW_WID, DRAW_LEN, DRAW_HEIGHT, RIGHT, TOP, FILL
+LOCAL DRAW, FILL_HEIGHT, FILL_LEN
 
     MOV CX, X           ; X-Pos
     MOV DX, Y           ; Y-Pos
-    MOV AX, 0C0EH       ; AH: Draw Pixel | AL: Color
+    MOV AX, 0C0EH       ; AH: Draw Pixel
 
+; To draw the front side
     DRAW_FILLED_RECT X, Y, LEN, HEIGHT
 
-    ADD CX, LEN
+    ADD CX, LEN     ; Reset X-Pos and Y-Pos to the bottom right corner
     DEC DX
 
+; To calculate the stop pos of the cuboid edges 
     MOV BX, DX
     MOV SI, WID
     SHR SI, 1
     SUB BX, SI
 
-    DRAW_WID:
+    MOV AL, 0FH             ; Color of Top and Left sides
+
+    DRAW:
+; To fill the right side of the cuboid
         INT 10H
         MOV DI, DX
         SUB DI, HEIGHT
@@ -164,6 +169,7 @@ LOCAL DRAW_WID, DRAW_LEN, DRAW_HEIGHT, RIGHT, TOP, FILL
             CMP DX, DI
         JNE FILL_HEIGHT
 
+; To fill the top side of the cuboid
         MOV DI, CX
         SUB DI, LEN
         FILL_LEN:
@@ -171,13 +177,15 @@ LOCAL DRAW_WID, DRAW_LEN, DRAW_HEIGHT, RIGHT, TOP, FILL
             INT 10H
             CMP CX, DI
         JNE FILL_LEN
+    
         ADD CX, LEN
         ADD DX, HEIGHT
         INC CX
         DEC DX
         CMP DX, BX
-    JNE DRAW_WID
+    JNE DRAW
 ENDM
+
 MAIN PROC FAR
   
 ; Change to video mode
@@ -185,7 +193,7 @@ MAIN PROC FAR
     INT 10H
 
     ;DRAW_FILLED_RECT 30, 100, 20, 10
-    DRAW_FILLED_CUBOID 100, 100, 20, 10, 15
+    DRAW_FILLED_CUBOID 140, 100, 20, 10, 15
     
     MOV AH, 4CH
     INT 21H

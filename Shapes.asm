@@ -67,30 +67,6 @@ LOCAL DRAW_WID, DRAW_LEN
 
 ENDM
 
-DRAW_FILLED_RECT MACRO X, Y, LEN, WID
-LOCAL DRAW_WID, DRAW_LEN, FILL
-    MOV CX, X           ; X-Pos
-    MOV DX, Y           ; Y-Pos
-    MOV AX, 0C0EH       ; AH: Draw Pixel | AL: Color
-
-    ; Draw the right and left sides
-    MOV BX, WID
-    ADD BX, DX
-    DRAW_WID:
-        INT 10H
-        MOV DI, CX
-        ADD DI, LEN
-        FILL:
-            INC CX
-            INT 10H
-            CMP CX, DI
-        JNE FILL
-        SUB CX, LEN
-        INC DX
-        CMP DX, BX
-    JNE DRAW_WID
-ENDM
-
 DRAW_CUBOID MACRO X, Y, LEN, WID, HEIGHT
 LOCAL DRAW_WID, DRAW_LEN, DRAW_HEIGHT, RIGHT, TOP
 
@@ -135,6 +111,30 @@ LOCAL DRAW_WID, DRAW_LEN, DRAW_HEIGHT, RIGHT, TOP
     JNZ TOP
     INT 10H
 
+ENDM
+
+DRAW_FILLED_RECT MACRO X, Y, LEN, WID
+LOCAL DRAW_WID, DRAW_LEN, FILL
+    MOV CX, X           ; X-Pos
+    MOV DX, Y           ; Y-Pos
+    MOV AX, 0C0EH       ; AH: Draw Pixel | AL: Color
+
+    ; Draw the right and left sides
+    MOV BX, WID
+    ADD BX, DX
+    DRAW_WID:
+        INT 10H
+        MOV DI, CX
+        ADD DI, LEN
+        FILL:
+            INC CX
+            INT 10H
+            CMP CX, DI
+        JNE FILL
+        SUB CX, LEN
+        INC DX
+        CMP DX, BX
+    JNE DRAW_WID
 ENDM
 
 DRAW_FILLED_CUBOID MACRO X, Y, LEN, WID, HEIGHT
@@ -186,8 +186,18 @@ LOCAL DRAW, FILL_HEIGHT, FILL_LEN
     JNE DRAW
 ENDM
 
+CLEAR_SCREEN PROC
+    MOV AX, 0600H
+    MOV BH, 01
+    MOV CX, 0
+    MOV DX, 184FH
+    INT 10H
+    RET
+CLEAR_SCREEN ENDP
+
 MAIN PROC FAR
   
+    
 ; Change to video mode
     MOV AX, 0013H
     INT 10H
@@ -195,6 +205,8 @@ MAIN PROC FAR
     ;DRAW_FILLED_RECT 30, 100, 20, 10
     DRAW_FILLED_CUBOID 140, 100, 20, 10, 15
     
+    CALL CLEAR_SCREEN
+
     MOV AH, 4CH
     INT 21H
 MAIN ENDP

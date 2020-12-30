@@ -376,7 +376,7 @@ MAIN PROC FAR
 				JNE SKIP1
 
 				MOV DX, IMG_HEIGHT
-				ADD DX, 5
+				ADD DX, 10
 				CMP Y_POS, DX
 				JLE SKIP1
 
@@ -391,7 +391,7 @@ SKIP1:
 				JNE SKIP2
 
 				MOV DX, IMG_WID
-				ADD DX, 5
+				ADD DX, 40
 				CMP X_POS, DX
 				JLE SKIP2
 
@@ -405,7 +405,7 @@ SKIP2:
 				CMP AH, 4DH
 				JNE SKIP3
 				
-				CMP X_POS, 630		; Depends on the video mode and screen dim
+				CMP X_POS, 600		; Depends on the video mode and screen dim
 				JGE SKIP3
 
 				CLEAR_PLAYER X_POS, Y_POS
@@ -418,7 +418,7 @@ SKIP3:
 				CMP AH, 50H
 				JNE SKIP4		
 
-				CMP Y_POS, 400		; Depends on the video mode and screen dim
+				CMP Y_POS, 300		; Depends on the video mode and screen dim
 				JGE SKIP4
 
 				CLEAR_PLAYER X_POS, Y_POS
@@ -435,7 +435,7 @@ SKIP4:
 				JNE SKIP5
 
 				MOV DX, IMG_HEIGHT
-				ADD DX, 5
+				ADD DX, 10
 				CMP Y_POS2, DX
 				JLE SKIP5
 
@@ -450,7 +450,7 @@ SKIP5:
 				JNE SKIP6
 
 				MOV DX, IMG_WID
-				ADD DX, 5
+				ADD DX, 40
 				CMP X_POS2, DX
 				JLE SKIP6
 
@@ -464,7 +464,7 @@ SKIP6:
 				CMP AH, 20H
 				JNE SKIP7
 				
-				CMP X_POS2, 630		; Depends on the video mode and screen dim
+				CMP X_POS2, 600		; Depends on the video mode and screen dim
 				JGE SKIP7
 
 				CLEAR_PLAYER X_POS2, Y_POS2
@@ -477,7 +477,7 @@ SKIP7:
 				CMP AH, 1FH
 				JNE SKIP8		
 
-				CMP Y_POS2, 400		; Depends on the video mode and screen dim
+				CMP Y_POS2, 300		; Depends on the video mode and screen dim
 				JGE SKIP8
 
 				CLEAR_PLAYER X_POS2, Y_POS2

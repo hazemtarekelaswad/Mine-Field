@@ -38,13 +38,6 @@ Y_POS DW 40
 STEP  DW 8
 
 .CODE
-; Clears Screen using (change to video mode interrupt)
-CLEAR_SCREEN PROC
-    MOV AX, 4f02H
-	MOV BX, 0100H    
-	INT 10H
-    RET
-CLEAR_SCREEN ENDP
 
 ; This macro does not accept X = 0 or Y = 0 as parameters
 ; It is recommended that X >= IMG_WID and Y >= IMG_HEIGHT
@@ -79,6 +72,32 @@ LOCAL START, DRAW
 	JNE  DRAW   	
 ENDM
 
+CLEAR_PLAYER MACRO X, Y
+	LOCAL START, CLEAR
+	MOV CX, X
+
+	MOV SI, X
+	SUB SI, IMG_WID
+
+	MOV DX, Y
+
+	MOV DI, Y
+	SUB DI, IMG_HEIGHT
+
+	JMP START
+
+	CLEAR:
+		MOV AX, 0C00H   	; BLACK
+	    INT 10H      
+	START:
+	    DEC CX       
+		CMP CX, SI
+	JNE CLEAR   
+		MOV CX, X  
+	    DEC DX     
+		CMP DX, DI
+	JNE  CLEAR   
+ENDM
 ; 	   White Up Arrow             48
 ;      White Left Arrow           4B
 ;      White Right Arrow          4D
@@ -105,11 +124,6 @@ MAIN PROC FAR
 			MOV AH, 0		
 			INT 16H			; Gets what's inside the buffer to AH
 
-			ESCAPE:
-				CMP AH, 1
-				JNE UP_ARROW
-				CALL CLEAR_SCREEN
-
 			UP_ARROW:
 				CMP AH, 48H
 				JNE LEFT_ARROW
@@ -117,14 +131,14 @@ MAIN PROC FAR
 				MOV DX, IMG_HEIGHT
 				ADD DX, 5
 				CMP Y_POS, DX
-				JLE INFINITE
+				JLE SKIP1
 
-				CALL CLEAR_SCREEN
+				CLEAR_PLAYER X_POS, Y_POS
 				MOV DX, STEP
 				SUB Y_POS, DX
 				DRAW_PLAYER X_POS, Y_POS
 			JMP REPEAT
-
+SKIP1:
 			LEFT_ARROW:
 				CMP AH, 4BH
 				JNE RIGHT_ARROW
@@ -132,40 +146,40 @@ MAIN PROC FAR
 				MOV DX, IMG_WID
 				ADD DX, 5
 				CMP X_POS, DX
-				JLE INFINITE
+				JLE SKIP2
 
-				CALL CLEAR_SCREEN
+				CLEAR_PLAYER X_POS, Y_POS
 				MOV DX, STEP
 				SUB X_POS, DX
 				DRAW_PLAYER X_POS, Y_POS
 			JMP REPEAT
-
+SKIP2:
 			RIGHT_ARROW:
 				CMP AH, 4DH
 				JNE DOWN_ARROW
 				
 				CMP X_POS, 630
-				JGE SKIP
+				JGE SKIP3
 
-				CALL CLEAR_SCREEN
+				CLEAR_PLAYER X_POS, Y_POS
 				MOV DX, STEP
 				ADD X_POS, DX
 				DRAW_PLAYER X_POS, Y_POS
 			JMP REPEAT
-SKIP:
+SKIP3:
 			DOWN_ARROW:
 				CMP AH, 50H
 				JNE REPEAT
 
 				CMP Y_POS, 400
-				JGE REPEAT
+				JGE SKIP4
 
-				CALL CLEAR_SCREEN
+				CLEAR_PLAYER X_POS, Y_POS
 				MOV DX, STEP
 				ADD Y_POS, DX
 				DRAW_PLAYER X_POS, Y_POS
 			JMP REPEAT
-
+SKIP4:
 		REPEAT:
 	JMP INFINITE
 

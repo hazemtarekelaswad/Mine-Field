@@ -32,9 +32,13 @@ IMG DB 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
  DB 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 
  DB 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 
-.CODE
+; Player initial position
+X_POS DW 620
+Y_POS DW 40
+STEP  DW 8
 
-; Clear Screen using (change to video mode interrupt)
+.CODE
+; Clears Screen using (change to video mode interrupt)
 CLEAR_SCREEN PROC
     MOV AX, 4f02H
 	MOV BX, 0100H    
@@ -42,6 +46,8 @@ CLEAR_SCREEN PROC
     RET
 CLEAR_SCREEN ENDP
 
+; This macro does not accept X = 0 or Y = 0 as parameters
+; It is recommended that X >= IMG_WID and Y >= IMG_HEIGHT
 DRAW_PLAYER MACRO X, Y
 LOCAL START, DRAW
 	MOV CX, X
@@ -73,6 +79,12 @@ LOCAL START, DRAW
 	JNE  DRAW   	
 ENDM
 
+; 	   White Up Arrow             48
+;      White Left Arrow           4B
+;      White Right Arrow          4D
+;      White Down Arrow           50
+
+
 MAIN PROC FAR
 	MOV AX, @DATA
 	MOV DS, AX
@@ -80,10 +92,62 @@ MAIN PROC FAR
 ; Change to Video Mode
 	MOV AX, 4f02H
 	MOV BX, 0100H    
-	INT 10H         	;execute the configuration
-	; MOV AH,0Bh   	    ;set the configuration
+	INT 10H         
+	; MOV AH,0Bh   	    
 	
-	DRAW_PLAYER 350, 230
+	DRAW_PLAYER X_POS, Y_POS
+
+	INFINITE:
+	; Check if the a key is pressed
+		MOV AH, 1			
+		INT 16H				; Gets a key in the buffer
+		JZ INFINITE
+			MOV AH, 0		
+			INT 16H			; Gets what's inside the buffer to AH
+
+			ESCAPE:
+				CMP AH, 1
+			JNE UP_ARROW
+				CALL CLEAR_SCREEN
+
+			UP_ARROW:
+				CMP AH, 48H
+			JNE LEFT_ARROW
+				CALL CLEAR_SCREEN
+				MOV DX, STEP
+				SUB Y_POS, DX
+				DRAW_PLAYER X_POS, Y_POS
+			JMP REPEAT
+
+			LEFT_ARROW:
+				CMP AH, 4BH
+			JNE RIGHT_ARROW
+				CALL CLEAR_SCREEN
+				MOV DX, STEP
+				SUB X_POS, DX
+				DRAW_PLAYER X_POS, Y_POS
+			JMP REPEAT
+
+			RIGHT_ARROW:
+				CMP AH, 4DH
+			JNE DOWN_ARROW
+				CALL CLEAR_SCREEN
+				MOV DX, STEP
+				ADD X_POS, DX
+				DRAW_PLAYER X_POS, Y_POS
+			JMP REPEAT
+
+			DOWN_ARROW:
+				CMP AH, 50H
+			JNE REPEAT
+				CALL CLEAR_SCREEN
+				MOV DX, STEP
+				ADD Y_POS, DX
+				DRAW_PLAYER X_POS, Y_POS
+			JMP REPEAT
+
+		REPEAT:
+	JMP INFINITE
 
 MAIN ENDP
 END MAIN

@@ -1,11 +1,11 @@
-.model small
-.Stack 64
-.data 
+.MODEL SMALL
+.STACK 64
+.DATA 
 ;put the img data outputed by python script here:
 ; Meo.bmp
-imgW equ 32
-imgH equ 32
-img DB 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 
+IMG_WID equ 32
+IMG_HEIGHT equ 32
+IMG DB 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 
  DB 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 19 
  DB 19, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 19, 21, 22, 21, 21, 22, 22, 21, 21, 22, 21, 19, 0, 0 
  DB 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 19, 22, 22, 25, 27, 28, 89, 89, 89, 89, 28, 27, 25, 22, 22, 19, 0, 0, 0, 0, 0, 0, 0, 0 
@@ -33,43 +33,59 @@ img DB 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
  DB 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 
 .CODE
+
+; Clear Screen using (change to video mode interrupt)
+CLEAR_SCREEN PROC
+    MOV AX, 4f02H
+	MOV BX, 0100H    
+	INT 10H
+    RET
+CLEAR_SCREEN ENDP
+
+DRAW_PLAYER MACRO X, Y
+LOCAL START, DRAW
+	MOV CX, X
+
+	MOV SI, X
+	SUB SI, IMG_WID
+
+	MOV DX, Y
+
+	MOV DI, Y
+	SUB DI, IMG_HEIGHT
+
+	LEA BX, IMG
+	JMP START
+
+	DRAW:
+		MOV AH, 0CH   	;set the configuration to writing a pixel
+		MOV AL, [BX]    	; color of the current coordinates
+	    ;MOV BH, 00H   	;set the page number
+	    INT 10H      
+	START:
+		INC BX
+	    DEC CX       
+		CMP CX, SI
+	JNE DRAW   
+		MOV CX, X  
+	    DEC DX     
+		CMP DX, DI
+	JNE  DRAW   	
+ENDM
+
 MAIN PROC FAR
-	MOV AX, @data
+	MOV AX, @DATA
 	MOV DS, AX
 
 ; Change to Video Mode
 	MOV AX, 4f02H
 	MOV BX, 0100H    
-	INT 10h         	;execute the configuration
-	;   MOV AH,0Bh   	;set the configuration
+	INT 10H         	;execute the configuration
+	; MOV AH,0Bh   	    ;set the configuration
 	
-	MOV CX, imgW  	    ;set the width (X) up to image width (based on image resolution)
-	MOV DX, imgH 		;set the hieght (Y) up to image height (based on image resolution)
-	MOV DI, offset img  ; to iterate over the pixels
-	JMP START    		;Avoid drawing before the calculations
-	
-	DRAWIT:
-		MOV AH, 0CH   	;set the configuration to writing a pixel
-		MOV AL, [DI]    	; color of the current coordinates
-	    MOV BH, 00H   	;set the page number
-	    INT 10H      	;execute the configuration
-	START: 
-		INC DI
-	    DEC CX       	;  loop iteration in x direction
-	    JNZ DRAWIT      	;  check if we can draw c urrent x and y and excape the y iteration
-	    MOV CX, imgW 	;  if loop iteration in y direction, then x should start over so that we sweep the grid
-	    DEC DX       	;  loop iteration in y direction
-	    JZ  ENDING   	;  both x and y reached 00 so end program
-		JMP DRAWIT
-
-	ENDING:
-
-
-
-; Clear Screen
-	MOV AX, 4f02H
-	MOV BX, 0100H    
-	INT 10h 
+	DRAW_PLAYER 350, 230
 
 MAIN ENDP
 END MAIN
+
+

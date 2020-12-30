@@ -32,7 +32,7 @@ IMG DB 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
  DB 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 
  DB 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 
-; Player initial position
+; Player initial position and speed
 X_POS DW 620
 Y_POS DW 40
 STEP  DW 8
@@ -100,19 +100,25 @@ MAIN PROC FAR
 	INFINITE:
 	; Check if the a key is pressed
 		MOV AH, 1			
-		INT 16H				; Gets a key in the buffer
+		INT 16H				; Gets a key in the keyboard buffer
 		JZ INFINITE
 			MOV AH, 0		
 			INT 16H			; Gets what's inside the buffer to AH
 
 			ESCAPE:
 				CMP AH, 1
-			JNE UP_ARROW
+				JNE UP_ARROW
 				CALL CLEAR_SCREEN
 
 			UP_ARROW:
 				CMP AH, 48H
-			JNE LEFT_ARROW
+				JNE LEFT_ARROW
+
+				MOV DX, IMG_HEIGHT
+				ADD DX, 5
+				CMP Y_POS, DX
+				JLE INFINITE
+
 				CALL CLEAR_SCREEN
 				MOV DX, STEP
 				SUB Y_POS, DX
@@ -121,7 +127,13 @@ MAIN PROC FAR
 
 			LEFT_ARROW:
 				CMP AH, 4BH
-			JNE RIGHT_ARROW
+				JNE RIGHT_ARROW
+
+				MOV DX, IMG_WID
+				ADD DX, 5
+				CMP X_POS, DX
+				JLE INFINITE
+
 				CALL CLEAR_SCREEN
 				MOV DX, STEP
 				SUB X_POS, DX
@@ -130,16 +142,24 @@ MAIN PROC FAR
 
 			RIGHT_ARROW:
 				CMP AH, 4DH
-			JNE DOWN_ARROW
+				JNE DOWN_ARROW
+				
+				CMP X_POS, 630
+				JGE SKIP
+
 				CALL CLEAR_SCREEN
 				MOV DX, STEP
 				ADD X_POS, DX
 				DRAW_PLAYER X_POS, Y_POS
 			JMP REPEAT
-
+SKIP:
 			DOWN_ARROW:
 				CMP AH, 50H
-			JNE REPEAT
+				JNE REPEAT
+
+				CMP Y_POS, 400
+				JGE REPEAT
+
 				CALL CLEAR_SCREEN
 				MOV DX, STEP
 				ADD Y_POS, DX

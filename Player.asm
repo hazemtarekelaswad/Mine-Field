@@ -73,8 +73,6 @@ X_POS2 DW 32
 Y_POS2 DW 350
 STEP2  DW 8
 
-
-
 .CODE
 
 ; This macro does not accept X = 0 or Y = 0 as parameters
@@ -232,7 +230,7 @@ SKIP4:
 
 				MOV DX, IMG_HEIGHT
 				ADD DX, 5
-				CMP Y_POS, DX
+				CMP Y_POS2, DX
 				JLE SKIP5
 
 				CLEAR_PLAYER X_POS2, Y_POS2

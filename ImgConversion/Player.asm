@@ -2,6 +2,7 @@
 .Stack 64
 .data 
 ;put the img data outputed by python script here:
+; Meo.bmp
 imgW equ 32
 imgH equ 32
 img DB 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 
@@ -31,43 +32,44 @@ img DB 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
  DB 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 
  DB 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 
-
-
 .CODE
 MAIN PROC FAR
-		   mov ax, @data
-		   mov DS, ax
+	MOV AX, @data
+	MOV DS, AX
 
-
-				; This piece of code was intended only for testing, so if you are using this grpahics mode for your project make sure you
-				; understand how it works well. for example if you are going to get mouse clicks from user, it might pbe difficult to 
-				; set up unlike the graphics mode we usually use...
-
-
-	       MOV AX, 4f02h    ;4F02H This Graphics mode configuration uses SVGA configuration (https://en.wikipedia.org/wiki/Super_VGA)
-				; which was not even created when asm86 first came out. I use it to be able to use 256 colors on 640x400
-				; it should work fine on tasm/masm extension for VSCode if your project does not use mouse clicks as controls
-	       mov BX, 0100h    
-	       INT 10h      	;execute the configuration
-	    ;   MOV AH,0Bh   	;set the configuration
-	       MOV CX, imgW  	;set the width (X) up to image width (based on image resolution)
-	       MOV DX, imgH 	;set the hieght (Y) up to image height (based on image resolution)
-	       mov DI, offset img  ; to iterate over the pixels
-	       jmp Start    	;Avoid drawing before the calculations
-	Drawit:
-	       MOV AH,0Ch   	;set the configuration to writing a pixel
-		   mov al, [DI]    ; color of the current coordinates
-	       MOV BH,00h   	;set the page number
-	       INT 10h      	;execute the configuration
-	Start: 
-		   inc DI
-	       DEC Cx       	;  loop iteration in x direction
-	       JNZ Drawit      	;  check if we can draw c urrent x and y and excape the y iteration
-	       mov Cx, imgW 	;  if loop iteration in y direction, then x should start over so that we sweep the grid
-	       DEC DX       	;  loop iteration in y direction
-	       JZ  ENDING   	;  both x and y reached 00 so end program
-		   Jmp Drawit
+; Change to Video Mode
+	MOV AX, 4f02H
+	MOV BX, 0100H    
+	INT 10h         	;execute the configuration
+	;   MOV AH,0Bh   	;set the configuration
+	
+	MOV CX, imgW  	    ;set the width (X) up to image width (based on image resolution)
+	MOV DX, imgH 		;set the hieght (Y) up to image height (based on image resolution)
+	MOV DI, offset img  ; to iterate over the pixels
+	JMP START    		;Avoid drawing before the calculations
+	
+	DRAWIT:
+		MOV AH, 0CH   	;set the configuration to writing a pixel
+		MOV AL, [DI]    	; color of the current coordinates
+	    MOV BH, 00H   	;set the page number
+	    INT 10H      	;execute the configuration
+	START: 
+		INC DI
+	    DEC CX       	;  loop iteration in x direction
+	    JNZ DRAWIT      	;  check if we can draw c urrent x and y and excape the y iteration
+	    MOV CX, imgW 	;  if loop iteration in y direction, then x should start over so that we sweep the grid
+	    DEC DX       	;  loop iteration in y direction
+	    JZ  ENDING   	;  both x and y reached 00 so end program
+		JMP DRAWIT
 
 	ENDING:
-	MAIN ENDP
+
+
+
+; Clear Screen
+	MOV AX, 4f02H
+	MOV BX, 0100H    
+	INT 10h 
+
+MAIN ENDP
 END MAIN

@@ -2,37 +2,7 @@
 
 .MODEL SMALL
 .STACK 64
-.DATA
 .CODE
-MOV AX, @DATA
-MOV DS, AX
-
-; DRAW_OCTA MACRO X, Y, LEN
-; LOCAL FIRST, SECOND, THIRD, FOURTH
-
-;     MOV CX, X
-;     MOV DX, Y
-;     MOV AX, 0C0EH
-
-;     MOV BX, LEN
-;     ADD BX, BX
-;     ADD BX, BX
-
-;     MOV SI, LEN
-;     ADD SI, Y
-;     FIRST:
-;         INT 10H
-;         ADD DX, BX
-;         INT 10H
-;         SUB DX, BX
-;         INC CX
-;         CMP CX, SI
-;     JNE FIRST
-
-;     SECOND:
-;     THIRD:
-;     FOURTH:
-; ENDM
 
 DRAW_RECT MACRO X, Y, LEN, WID
 LOCAL DRAW_WID, DRAW_LEN
@@ -198,7 +168,7 @@ CLEAR_SCREEN ENDP
 MAIN PROC FAR
 
 ; Change to video mode
-    MOV AX, 0013H
+    MOV AX, 0010H
     INT 10H
 
     DRAW_FILLED_CUBOID 140, 100, 20, 10, 15

@@ -63,17 +63,222 @@ PIKA DB 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 
 
 ; First Player's image, initial position and speed
 PLAYER_IMG EQU MEO
-X_POS DW 620
-Y_POS DW 40
-STEP  DW 8
+X_POS 	DW 616
+Y_POS 	DW 37
+STEPX  	DW 80
+STEPY  	DW 43
 
 ; Second Player's image, initial position and speed
 PLAYER_IMG2 EQU PIKA
-X_POS2 DW 32
-Y_POS2 DW 350
-STEP2  DW 8
+X_POS2 	DW 56
+Y_POS2 	DW 337
+STEPX2  DW 80
+STEPY2  DW 43
 
 .CODE
+
+DRAW_GRID PROC 
+						
+	MOV AH, 0CH ; Draw Pixel Command  
+	MOV AL, 0bh ; grid's Pixel of light aqua color 
+	MOV CX, 0 ;Starting ith position 
+	MOV DX, 0 ;Starting jth position 
+	INT 10H
+
+
+						
+
+	FirstLineoftheSquare:
+	INT 10H
+	INC CX
+	CMP CX, 639 
+	JNZ FirstLineoftheSquare   
+
+
+	
+	SecondLineoftheSquare:
+	INT 10H
+	INC DX
+	CMP DX, 343
+	JNZ SecondLineoftheSquare 
+
+
+	ThirdLineoftheSquare:
+	INT 10H
+	dec cx
+	CMP CX, 0 
+	JNZ ThirdLineoftheSquare   
+
+	FourthLineoftheSquare:
+	INT 10H
+	dec dx
+	CMP DX, 0 
+	JNZ FourthLineoftheSquare
+
+	mov cx, 80 
+	mov dx, 0
+	
+	;mov bx, 344
+	vlone:
+	int 10h
+	inc dx
+	cmp dx, 344
+	jnz vlone
+
+	mov cx, 160
+	mov dx, 0
+	;mov bx, 344
+	vltwo:
+	int 10h
+	inc dx
+	cmp dx, 344
+	jnz vltwo
+
+
+	mov cx, 240
+	mov dx, 0
+	;mov bx, 344
+	vlthree:
+	int 10h
+	inc dx
+	cmp dx, 344
+	jnz vlthree
+
+	mov cx, 320
+	mov dx, 0
+	vlfour:
+	int 10h
+	inc dx
+	cmp dx, 344
+	jnz vlfour      
+
+
+	mov cx, 400
+	mov dx, 0
+	;mov bx, 344
+	vlfive:
+	int 10h
+	inc dx
+	cmp dx, 344
+	jnz vlfive
+
+
+	mov cx, 480
+	mov dx, 0
+	;mov bx, 344
+	vlsix:
+	int 10h
+	inc dx
+	cmp dx, 344
+	jnz vlsix
+
+	mov cx, 560
+	mov dx, 0
+	;mov bx, 344
+	vlseven:
+	int 10h
+	inc dx
+	cmp dx, 344
+	jnz vlseven  
+
+
+	mov cx, 640
+	mov dx, 0
+	;mov bx, 344
+	vleight:
+	int 10h
+	inc dx
+	cmp dx, 344
+	jnz vleight   
+
+
+
+
+	mov cx, 0
+	mov dx, 43
+
+
+	hlone:
+	INT 10H
+	INC CX
+	CMP CX, 639
+	JNZ hlone
+
+
+	mov cx, 0
+	mov dx, 86
+
+	;MOV BX, 320
+	hltwo:
+	INT 10H
+	INC CX
+	CMP CX, 639
+	JNZ hltwo
+
+
+	mov cx, 0
+	mov dx, 129
+
+	;MOV BX, 320
+	hlthree:
+	INT 10H
+	INC CX
+	CMP CX, 639
+	JNZ hlthree
+
+	mov cx, 0
+	mov dx, 172
+
+	;MOV BX, 320
+	hlfour:
+	INT 10H
+	INC CX
+	CMP CX, 639
+	JNZ hlfour
+
+
+	mov cx, 0
+	mov dx, 215
+
+	;MOV BX, 320
+	hlfive:
+	INT 10H
+	INC CX
+	CMP CX, 639 
+	JNZ hlfive
+
+	mov cx, 0
+	mov dx, 258
+
+	;MOV BX, 320
+	hlsix:
+	INT 10H
+	INC CX
+	CMP CX, 639
+	JNZ hlsix
+
+
+	mov cx, 0
+	mov dx, 301
+
+	;MOV BX, 320
+	hlseven:
+	INT 10H
+	INC CX
+	CMP CX, 639
+	JNZ hlseven
+
+	mov cx, 0
+	mov dx, 344
+
+	;MOV BX, 320
+	hleight:
+	INT 10H
+	INC CX
+	CMP CX, 639
+	JNZ hleight
+	RET
+ENDP
 
 ; This macro does not accept X = 0 or Y = 0 as parameters
 ; It is recommended that X >= IMG_WID and Y >= IMG_HEIGHT
@@ -152,8 +357,9 @@ MAIN PROC FAR
 	MOV AX, 4f02H
 	MOV BX, 0100H    
 	INT 10H         
-	; MOV AH,0Bh   	    
-	
+	; MOV AH,0Bh 
+
+	CALL DRAW_GRID
 	DRAW_PLAYER PLAYER_IMG, X_POS, Y_POS
 	DRAW_PLAYER PLAYER_IMG2, X_POS2, Y_POS2
 
@@ -175,7 +381,7 @@ MAIN PROC FAR
 				JLE SKIP1
 
 				CLEAR_PLAYER X_POS, Y_POS
-				MOV DX, STEP
+				MOV DX, STEPY
 				SUB Y_POS, DX
 				DRAW_PLAYER PLAYER_IMG, X_POS, Y_POS
 			JMP INFINITE
@@ -190,7 +396,7 @@ SKIP1:
 				JLE SKIP2
 
 				CLEAR_PLAYER X_POS, Y_POS
-				MOV DX, STEP
+				MOV DX, STEPX
 				SUB X_POS, DX
 				DRAW_PLAYER PLAYER_IMG, X_POS, Y_POS
 			JMP INFINITE
@@ -203,7 +409,7 @@ SKIP2:
 				JGE SKIP3
 
 				CLEAR_PLAYER X_POS, Y_POS
-				MOV DX, STEP
+				MOV DX, STEPX
 				ADD X_POS, DX
 				DRAW_PLAYER PLAYER_IMG, X_POS, Y_POS
 			JMP INFINITE
@@ -216,7 +422,7 @@ SKIP3:
 				JGE SKIP4
 
 				CLEAR_PLAYER X_POS, Y_POS
-				MOV DX, STEP
+				MOV DX, STEPY
 				ADD Y_POS, DX
 				DRAW_PLAYER PLAYER_IMG, X_POS, Y_POS
 			JMP INFINITE
@@ -234,7 +440,7 @@ SKIP4:
 				JLE SKIP5
 
 				CLEAR_PLAYER X_POS2, Y_POS2
-				MOV DX, STEP2
+				MOV DX, STEPY2
 				SUB Y_POS2, DX
 				DRAW_PLAYER PLAYER_IMG2, X_POS2, Y_POS2
 			JMP INFINITE
@@ -249,7 +455,7 @@ SKIP5:
 				JLE SKIP6
 
 				CLEAR_PLAYER X_POS2, Y_POS2
-				MOV DX, STEP2
+				MOV DX, STEPX2
 				SUB X_POS2, DX
 				DRAW_PLAYER PLAYER_IMG2, X_POS2, Y_POS2
 			JMP INFINITE
@@ -262,7 +468,7 @@ SKIP6:
 				JGE SKIP7
 
 				CLEAR_PLAYER X_POS2, Y_POS2
-				MOV DX, STEP2
+				MOV DX, STEPX2
 				ADD X_POS2, DX
 				DRAW_PLAYER PLAYER_IMG2, X_POS2, Y_POS2
 			JMP INFINITE
@@ -275,7 +481,7 @@ SKIP7:
 				JGE SKIP8
 
 				CLEAR_PLAYER X_POS2, Y_POS2
-				MOV DX, STEP2
+				MOV DX, STEPY2
 				ADD Y_POS2, DX
 				DRAW_PLAYER PLAYER_IMG2, X_POS2, Y_POS2
 			JMP INFINITE

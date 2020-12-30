@@ -3,30 +3,28 @@
  
 
 
-coin macro  x,y
-    
+coin macro  x,y   
+    mov cx,1 ; number of drawings
+    mov dl,x ; x coordinate
+    mov dh,y; y coordinate
 
-mov cx,1 ; number of drawings
-mov dl,x ; x coordinate
-mov dh,y; y coordinate
+    mov ah,2
+    int 10h
 
-mov ah,2
-int 10h
-
-mov al,'O'
-mov ah,9h
-mov bl,0Eh
-int 10h
- endm 
+    mov al,'O'
+    mov ah,9h
+    mov bl,0Eh
+    int 10h
+endm 
 ; start of the grid code block
 grid proc far 
 
 
 
 ; Chaging to video mode
-MOV AH, 00h
-MOV AL, 10h
-INT 10H
+MOV AX, 4f02H
+MOV BX, 0100H    
+INT 10H 
 
 
 

@@ -1,8 +1,8 @@
 .MODEL SMALL
 .STACK 64
 .DATA 
-;put the img data outputed by python script here:
-; Meo.bmp
+
+; Meo.bmp data
 IMG_WID EQU 32
 IMG_HEIGHT EQU 32
 MEO DB 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 
@@ -32,6 +32,7 @@ MEO DB 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
  DB 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 
  DB 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 
+; Pika.bmp data
 IMG_WID2 EQU 32
 IMG_HEIGHT2 EQU 32
 PIKA DB 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16 
@@ -62,11 +63,11 @@ PIKA DB 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 
  DB 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16
 
 ; First Player's image, initial position and speed
-PLAYER_IMG EQU MEO
-X_POS 	DW 616
+PLAYER_IMG EQU MEO		; The name is defined above
+X_POS 	DW 616			; X and Y posistion of the player's right bottom corner
 Y_POS 	DW 37
-STEPX  	DW 80
-STEPY  	DW 43
+STEPX  	DW 80			; Step in horizontal direction
+STEPY  	DW 43			; Step in vertical direction
 
 ; Second Player's image, initial position and speed
 PLAYER_IMG2 EQU PIKA
@@ -77,6 +78,19 @@ STEPY2  DW 43
 
 .CODE
 
+;		Key						scancode
+;		
+; 	    White Up Arrow             48
+;       White Left Arrow           4B
+;       White Right Arrow          4D
+;       White Down Arrow           50
+;       w                          11
+;       a                          1E
+;       s                          1F
+;       d                          20
+
+
+; Draws 8 X 8 Grid with 640 X 350 px of screen dimensions (VIDEO MODE AX = 0010H OR AX = 4F02H, BX = 0100) 
 DRAW_GRID PROC 
 						
 	MOV AH, 0CH ; Draw Pixel Command  
@@ -282,6 +296,7 @@ ENDP
 
 ; This macro does not accept X = 0 or Y = 0 as parameters
 ; It is recommended that X >= IMG_WID and Y >= IMG_HEIGHT
+; X and Y are 16-bit values, so don't use 8-bit general registers
 DRAW_PLAYER MACRO PLAYER_IMG, X, Y
 LOCAL START, DRAW
 	MOV CX, X
@@ -313,6 +328,7 @@ LOCAL START, DRAW
 	JNE  DRAW   	
 ENDM
 
+; This macro changes each pixel of the player to black 
 CLEAR_PLAYER MACRO X, Y
 	LOCAL START, CLEAR
 	MOV CX, X
@@ -340,29 +356,24 @@ CLEAR_PLAYER MACRO X, Y
 	JNE  CLEAR   
 ENDM
 
-; 	   White Up Arrow             48
-;      White Left Arrow           4B
-;      White Right Arrow          4D
-;      White Down Arrow           50
-;      w                          11
-;      a                          1E
-;      s                          1F
-;      d                          20
+CHANGE_TO_VIDEO PROC 
+	MOV AX, 4F02H
+	MOV BX, 0100H    
+	INT 10H         
+	; MOV AH,0Bh 
+	RET
+ENDP
 
 MAIN PROC FAR
 	MOV AX, @DATA
 	MOV DS, AX
-
-; Change to Video Mode
-	MOV AX, 4f02H
-	MOV BX, 0100H    
-	INT 10H         
-	; MOV AH,0Bh 
-
+	
+	CALL CHANGE_TO_VIDEO
 	CALL DRAW_GRID
 	DRAW_PLAYER PLAYER_IMG, X_POS, Y_POS
 	DRAW_PLAYER PLAYER_IMG2, X_POS2, Y_POS2
 
+; Infinite loop that lets the user move players all around the grid
 	INFINITE:
 	; Check if the a key is pressed
 		MOV AH, 1			
@@ -371,15 +382,19 @@ MAIN PROC FAR
 			MOV AH, 0		
 			INT 16H			; Gets what's inside the buffer to AH
 
+; First Player
+
 			UP_ARROW:
 				CMP AH, 48H
 				JNE SKIP1
 
+			; Checks if it reaches the top border
 				MOV DX, IMG_HEIGHT
 				ADD DX, 10
 				CMP Y_POS, DX
 				JLE SKIP1
 
+			; Lets the player move by STEPY 
 				CLEAR_PLAYER X_POS, Y_POS
 				MOV DX, STEPY
 				SUB Y_POS, DX

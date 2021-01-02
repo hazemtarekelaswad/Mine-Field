@@ -1,5 +1,5 @@
 from PIL import Image
-filename = 'Meo.bmp'
+filename = 'dollar.bmp'
 im = Image.open(filename)
 width, height = im.size
 pixels = list(im.getdata())

@@ -63,6 +63,17 @@ PIKA DB 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 
  DB 244, 20, 20, 20, 220, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 147, 175, 174, 174, 174, 16, 16, 16, 16, 16, 16, 16, 16 
  DB 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16
 
+;dollar.bmp data
+IMG_WID3 equ 16
+IMG_HEIGHT3 equ 16
+DOLLAR DB 0, 0, 0, 0, 66, 66, 66, 66, 66, 66, 66, 66, 0, 0, 0, 0, 0, 0, 44, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 44, 0, 0, 0, 44, 66, 66, 66, 66, 14, 14 
+ DB 14, 14, 66, 66, 66, 66, 44, 0, 0, 66, 66, 66, 14, 14, 14, 14, 14, 14, 14, 14, 66, 66, 66, 0, 66, 66, 66, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 66, 66, 66 
+ DB 66, 66, 66, 14, 14, 14, 14, 66, 66, 14, 14, 14, 14, 66, 66, 66, 66, 66, 14, 14, 14, 14, 66, 14, 14, 66, 14, 14, 14, 14, 66, 66, 66, 66, 14, 14, 14, 14, 14, 14 
+ DB 14, 14, 14, 14, 14, 14, 66, 66, 66, 66, 14, 14, 14, 14, 14, 14, 66, 14, 14, 14, 14, 14, 66, 66, 66, 66, 14, 14, 14, 14, 14, 14, 14, 66, 14, 14, 14, 14, 66, 66 
+ DB 66, 66, 66, 14, 14, 14, 14, 66, 66, 14, 14, 14, 14, 66, 66, 66, 66, 66, 66, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 66, 66, 66, 0, 66, 66, 66, 14, 14, 14, 14 
+ DB 14, 14, 14, 14, 66, 66, 66, 0, 0, 44, 66, 66, 66, 66, 14, 14, 14, 14, 66, 66, 66, 66, 44, 0, 0, 0, 44, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 44, 0, 0 
+ DB 0, 0, 0, 0, 66, 66, 66, 66, 66, 66, 66, 66, 0, 0, 0, 0
+
 ; First Player's image, initial position and speed
 PLAYER_IMG EQU MEO		; The name is defined above
 X_POS 	DW 616			; X and Y posistion of the player's right bottom corner
@@ -300,17 +311,17 @@ ENDP
 ; This macro does not accept X = 0 or Y = 0 as parameters
 ; It is recommended that X >= IMG_WID and Y >= IMG_HEIGHT
 ; X and Y are 16-bit values, so don't use 8-bit general registers
-DRAW_PLAYER MACRO PLAYER_IMG, X, Y
+DRAW_PLAYER MACRO PLAYER_IMG, X, Y, WID, HEIGHT
 LOCAL START, DRAW
 	MOV CX, X
 
 	MOV SI, X
-	SUB SI, IMG_WID
+	SUB SI, WID
 
 	MOV DX, Y
 
 	MOV DI, Y
-	SUB DI, IMG_HEIGHT
+	SUB DI, HEIGHT
 
 	LEA BX, PLAYER_IMG
 	JMP START
@@ -363,7 +374,7 @@ DRAW_RECT MACRO X, Y, LEN, WID
 LOCAL DRAW_WID, DRAW_LEN
     MOV CX, X           ; X-Pos
     MOV DX, Y           ; Y-Pos
-    MOV AX, 0C0EH       ; AH: Draw Pixel | AL: Color
+    MOV AX, 0C0CH       ; AH: Draw Pixel | AL: Color
 
     ; Draw the right and left sides
     MOV BX, WID
@@ -397,7 +408,7 @@ LOCAL DRAW_WID, DRAW_LEN, DRAW_HEIGHT, RIGHT, TOP
 
     MOV CX, X           ; X-Pos
     MOV DX, Y           ; Y-Pos
-    MOV AX, 0C0EH       ; AH: Draw Pixel | AL: Color
+    MOV AX, 0C0CH       ; AH: Draw Pixel | AL: Color
 
     DRAW_RECT X, Y, LEN, HEIGHT
 
@@ -442,7 +453,7 @@ DRAW_FILLED_RECT MACRO X, Y, LEN, WID
 LOCAL DRAW_WID, DRAW_LEN, FILL
     MOV CX, X           ; X-Pos
     MOV DX, Y           ; Y-Pos
-    MOV AX, 0C0EH       ; AH: Draw Pixel | AL: Color
+    MOV AX, 0C09H       ; AH: Draw Pixel | AL: Color
 
     ; Draw the right and left sides
     MOV BX, WID
@@ -467,7 +478,7 @@ LOCAL DRAW, FILL_HEIGHT, FILL_LEN
 
     MOV CX, X           ; X-Pos
     MOV DX, Y           ; Y-Pos
-    MOV AX, 0C0EH       ; AH: Draw Pixel
+    MOV AX, 0C01H       ; AH: Draw Pixel
 
 ; To draw the front side
     DRAW_FILLED_RECT X, Y, LEN, HEIGHT
@@ -481,7 +492,7 @@ LOCAL DRAW, FILL_HEIGHT, FILL_LEN
     SHR SI, 1
     SUB BX, SI
 
-    MOV AL, 0FH             ; Color of Top and Left sides
+    MOV AL, 1             ; Color of Top and Left sides
 
     DRAW:
 ; To fill the right side of the cuboid
@@ -532,6 +543,12 @@ DRAW_COIN MACRO X, Y
     int 10h
 endm 
 
+; initial X of coins 47
+; initial Y of coins 30
+DRAW_COIN_IMG MACRO X, Y
+	DRAW_PLAYER DOLLAR, X, Y, IMG_WID3, IMG_HEIGHT3
+ENDM
+
 CLEAR_SCREEN PROC
     MOV AX, 0013H
     INT 10H
@@ -554,6 +571,8 @@ LOCAL Y_CO, X_CO, EXISTS, FINISHED
 	MOV CX, X
 	MOV DX, Y
 
+	MOV BX, X
+
 	MOV SI, 80
 	ADD SI, CX
 
@@ -571,7 +590,7 @@ LOCAL Y_CO, X_CO, EXISTS, FINISHED
 			CMP CX, SI
 		JNE X_CO
 
-		MOV CX, Y
+		MOV CX, BX
 		INC DX
 		CMP DX, DI
 	JNE Y_CO
@@ -587,8 +606,8 @@ MAIN PROC FAR
 	
 	CALL CHANGE_TO_VIDEO
 	CALL DRAW_GRID
-	DRAW_PLAYER PLAYER_IMG, X_POS, Y_POS
-	DRAW_PLAYER PLAYER_IMG2, X_POS2, Y_POS2
+	DRAW_PLAYER PLAYER_IMG, X_POS, Y_POS, IMG_WID, IMG_HEIGHT
+	DRAW_PLAYER PLAYER_IMG2, X_POS2, Y_POS2, IMG_WID2, IMG_HEIGHT2
 
 	DRAW_FILLED_CUBOID 30, 15, 15, 12, 15
 	DRAW_FILLED_CUBOID 110, 144, 15, 12, 15
@@ -596,7 +615,7 @@ MAIN PROC FAR
 	DRAW_FILLED_CUBOID 510, 187, 15, 12, 15
 	DRAW_FILLED_CUBOID 350, 236, 15, 12, 15
 	DRAW_FILLED_CUBOID 590, 322, 15, 12, 15
-
+	DRAW_COIN_IMG 127, 30
 
 	
 ; Infinite loop that lets the user move players all around the grid
@@ -618,13 +637,13 @@ MAIN PROC FAR
 				MOV DX, IMG_HEIGHT
 				ADD DX, 10
 				CMP Y_POS, DX
-				JLE SKIP1
+				JLE SKIP1 
 
 			; Lets the player move by STEPY 
 				CLEAR_PLAYER X_POS, Y_POS
 				MOV DX, STEPY
 				SUB Y_POS, DX
-				DRAW_PLAYER PLAYER_IMG, X_POS, Y_POS
+				DRAW_PLAYER PLAYER_IMG, X_POS, Y_POS, IMG_WID, IMG_HEIGHT
 			JMP INFINITE
 SKIP1:
 			LEFT_ARROW:
@@ -639,7 +658,7 @@ SKIP1:
 				CLEAR_PLAYER X_POS, Y_POS
 				MOV DX, STEPX
 				SUB X_POS, DX
-				DRAW_PLAYER PLAYER_IMG, X_POS, Y_POS
+				DRAW_PLAYER PLAYER_IMG, X_POS, Y_POS, IMG_WID, IMG_HEIGHT
 			JMP INFINITE
 SKIP2:
 			RIGHT_ARROW:
@@ -652,7 +671,7 @@ SKIP2:
 				CLEAR_PLAYER X_POS, Y_POS
 				MOV DX, STEPX
 				ADD X_POS, DX
-				DRAW_PLAYER PLAYER_IMG, X_POS, Y_POS
+				DRAW_PLAYER PLAYER_IMG, X_POS, Y_POS, IMG_WID, IMG_HEIGHT
 			JMP INFINITE
 SKIP3:
 			DOWN_ARROW:
@@ -662,10 +681,18 @@ SKIP3:
 				CMP Y_POS, 300		; Depends on the video mode and screen dim
 				JGE SKIP4
 
+				MOV DX, Y_POS
+				ADD DX, 6
+				MOV CX, X_POS
+				SUB CX, 56
+				CONTAINS CX, DX, 14
+				CMP CONTAINS_FLAG, 1
+				JE SKIP4
+
 				CLEAR_PLAYER X_POS, Y_POS
 				MOV DX, STEPY
 				ADD Y_POS, DX
-				DRAW_PLAYER PLAYER_IMG, X_POS, Y_POS
+				DRAW_PLAYER PLAYER_IMG, X_POS, Y_POS, IMG_WID, IMG_HEIGHT
 			JMP INFINITE
 SKIP4:
 
@@ -680,10 +707,21 @@ SKIP4:
 				CMP Y_POS2, DX
 				JLE SKIP5
 
+				; MOV DX, Y_POS
+				; SUB DX, IMG_HEIGHT
+				; SUB DX, 5
+				; SUB DX, 43
+				; MOV CX, X_POS
+				; SUB CX, 56
+				; CONTAINS CX, DX, 90
+				; CMP CONTAINS_FLAG, 1
+				; JE SKIP5
+				
+
 				CLEAR_PLAYER X_POS2, Y_POS2
 				MOV DX, STEPY2
 				SUB Y_POS2, DX
-				DRAW_PLAYER PLAYER_IMG2, X_POS2, Y_POS2
+				DRAW_PLAYER PLAYER_IMG2, X_POS2, Y_POS2, IMG_WID2, IMG_HEIGHT2
 			JMP INFINITE
 SKIP5:
 			A_KEY:
@@ -698,7 +736,7 @@ SKIP5:
 				CLEAR_PLAYER X_POS2, Y_POS2
 				MOV DX, STEPX2
 				SUB X_POS2, DX
-				DRAW_PLAYER PLAYER_IMG2, X_POS2, Y_POS2
+				DRAW_PLAYER PLAYER_IMG2, X_POS2, Y_POS2, IMG_WID2, IMG_HEIGHT2
 			JMP INFINITE
 SKIP6:
 			D_KEY:
@@ -711,7 +749,7 @@ SKIP6:
 				CLEAR_PLAYER X_POS2, Y_POS2
 				MOV DX, STEPX2
 				ADD X_POS2, DX
-				DRAW_PLAYER PLAYER_IMG2, X_POS2, Y_POS2
+				DRAW_PLAYER PLAYER_IMG2, X_POS2, Y_POS2, IMG_WID2, IMG_HEIGHT2
 			JMP INFINITE
 SKIP7:
 			S_KEY:
@@ -724,7 +762,7 @@ SKIP7:
 				CLEAR_PLAYER X_POS2, Y_POS2
 				MOV DX, STEPY2
 				ADD Y_POS2, DX
-				DRAW_PLAYER PLAYER_IMG2, X_POS2, Y_POS2
+				DRAW_PLAYER PLAYER_IMG2, X_POS2, Y_POS2, IMG_WID2, IMG_HEIGHT2
 			JMP INFINITE
 SKIP8:
 	JMP INFINITE

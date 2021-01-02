@@ -66,22 +66,14 @@ PIKA DB 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 
 ;dollar.bmp data
 IMG_WID3 EQU 16
 IMG_HEIGHT3 EQU 16
-DOLLAR DB 0, 0, 0, 0, 66, 66, 66, 66, 66, 66, 66, 66, 0, 0, 0, 0, 0, 0, 44, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 44, 0, 0, 0, 44, 66, 66, 66, 66, 14, 14 
- DB 14, 14, 66, 66, 66, 66, 44, 0, 0, 66, 66, 66, 14, 14, 14, 14, 14, 14, 14, 14, 66, 66, 66, 0, 66, 66, 66, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 66, 66, 66 
- DB 66, 66, 66, 14, 14, 14, 14, 66, 66, 14, 14, 14, 14, 66, 66, 66, 66, 66, 14, 14, 14, 14, 66, 14, 14, 66, 14, 14, 14, 14, 66, 66, 66, 66, 14, 14, 14, 14, 14, 14 
- DB 14, 14, 14, 14, 14, 14, 66, 66, 66, 66, 14, 14, 14, 14, 14, 14, 66, 14, 14, 14, 14, 14, 66, 66, 66, 66, 14, 14, 14, 14, 14, 14, 14, 66, 14, 14, 14, 14, 66, 66 
- DB 66, 66, 66, 14, 14, 14, 14, 66, 66, 14, 14, 14, 14, 66, 66, 66, 66, 66, 66, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 66, 66, 66, 0, 66, 66, 66, 14, 14, 14, 14 
- DB 14, 14, 14, 14, 66, 66, 66, 0, 0, 44, 66, 66, 66, 66, 14, 14, 14, 14, 66, 66, 66, 66, 44, 0, 0, 0, 44, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 44, 0, 0 
- DB 0, 0, 0, 0, 66, 66, 66, 66, 66, 66, 66, 66, 0, 0, 0, 0
+DOLLAR DB 0, 0, 0, 0, 66, 66, 66, 66, 66, 66, 66, 66, 0, 0, 0, 0, 0, 0, 44, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 44, 0, 0, 0, 44, 66, 66, 66, 66, 14, 14, 14, 14, 66, 66, 66, 66, 44, 0, 0, 66, 66, 66, 14, 14, 14, 14, 14, 14, 14, 14, 66, 66, 66, 0, 66, 66, 66, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 66, 66, 66, 66, 66, 66, 14, 14, 14, 14, 66, 66, 14, 14, 14, 14, 66, 66, 66, 66, 66, 14, 14, 14, 14, 66, 14, 14, 66, 14, 14, 14, 14, 66, 66, 66, 66, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 66, 66, 66, 66, 14, 14, 14, 14, 14, 14, 66, 14, 14, 14, 14, 14, 66, 66, 66, 66, 14, 14, 14, 14, 14, 14, 14, 66, 14, 14, 14, 14, 66, 66, 66, 66, 66, 14, 14, 14, 14, 66, 66, 14, 14, 14, 14, 66, 66, 66, 66, 66, 66, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 66, 66, 66, 0, 66, 66, 66, 14, 14, 14, 14, 14, 14, 14, 14, 66, 66, 66, 0, 0, 44, 66, 66, 66, 66, 14, 14, 14, 14, 66, 66, 66, 66, 44, 0, 0, 0, 44, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 44, 0, 0, 0, 0, 0, 0, 66, 66, 66, 66, 66, 66, 66, 66, 0, 0, 0, 0
 
-TEMP_WID_16		DB 16
-TEMP_HEIGHT_16	DB 16
+TEMP_WID_16		DW 16
+TEMP_HEIGHT_16	DW 16
 TEMP_IMG_16		DB 256 DUP(?)
 
-TEMP_WID_32		DB 32
-TEMP_HEIGHT_32	DB 32
-TEMP_IMG_32		DB 1024 DUP(?)
-
+TEMP_X DW ?
+TEMP_Y DW ?
 
 ; First Player's image, initial position and speed
 PLAYER_IMG EQU MEO		; The name is defined above
@@ -96,6 +88,9 @@ X_POS2 	DW 56
 Y_POS2 	DW 337
 STEPX2  DW 80
 STEPY2  DW 43
+
+X_RAND	DW ?
+Y_RAND  DW ?
 
 CONTAINS_FLAG	DB 0
 
@@ -577,6 +572,53 @@ CHANGE_TO_VIDEO PROC
 	RET
 ENDP
 
+RandGen Proc
+   ; A procedure which produce a random value in dx 
+   MOV AH, 00h  ; interrupts to get system time        
+   INT 1AH      ; CX:DX now hold number of clock ticks since midnight      
+
+   mov  ax, dx
+   xor  dx, dx
+   mov  cx, 10    
+   div  cx       ; here dx contains the remainder of the division - from 0 to 9
+   
+   ;add  dl, '0'  ; to ascii from '0' to '9'
+   ;mov ah, 2h   ; call interrupt to display a value in DL
+   ;int 21h    
+   RET 
+ENDP
+    
+Draw_Rand_Box Proc 
+    
+   ReGenRand1:
+
+    call RandGen
+	Mov Ax, 80
+	Mul dl
+    Sub Ax, 45
+
+    cmp Ax, 640
+	JNC ReGenRand1
+
+    Mov X_RAND, Ax
+
+    ReGenRand2:
+
+    call RandGen
+	Mov Ax, 43
+    Mul dl
+	sub Ax, 23
+
+	cmp Ax, 350
+	JNC ReGenRand2
+
+	Mov Y_RAND, AX
+
+	DRAW_FILLED_CUBOID X_RAND, Y_RAND , 15, 12, 15
+
+	RET 
+ENDP
+
 ; Works with 80 X 43 px cell size
 ; CONTAINS_FLAG is set if it finds the passed color in the cell
 CONTAINS MACRO X, Y, COLOR
@@ -613,84 +655,60 @@ EXISTS:
 FINISHED:
 ENDM
 
-STORE_IMG MACRO X, Y
-LOCAL X_POS, Y_POS
-	MOV AH, 0DH
+; Don't pass registers, and don't ask for the shitty reason because I don't f know
+STORE_IMG_16 MACRO X, Y
+LOCAL STORE, START
 	MOV CX, X
-	MOV DX, Y
 
-	MOV BX, X
-
-	MOV SI, CX
+	MOV SI, X
 	SUB SI, TEMP_WID_16
 
-	MOV DI, DX
-	SUB DI, TEMP_HEIGHT_16
-	
-	X_POS:
-		Y_POS:
-			INT 10H
-			MOV TEMP_IMG_16, AL
-			DEC CX
-			CMP CX, SI
-		JNE Y_POS
+	MOV DX, Y
 
-		MOV CX, BX
-		DEC DX
+	MOV DI, Y
+	SUB DI, TEMP_HEIGHT_16
+
+	LEA BX, TEMP_IMG_16
+	JMP START
+
+	STORE:
+		MOV AH, 0DH
+		INT 10H
+		MOV [BX], AL   
+	START:
+		INC BX
+	    DEC CX       
+		CMP CX, SI
+	JNE STORE   
+		MOV CX, X  
+	    DEC DX     
 		CMP DX, DI
-	JNE X_POS
+	JNE STORE 
 ENDM
 
-RandGen Proc
-   ; A procedure which produce a random value in dx 
-   MOV AH, 00h  ; interrupts to get system time        
-   INT 1AH      ; CX:DX now hold number of clock ticks since midnight      
+; Sets ZF if they are diff, resets ZF if they are the same
+COMPARE_OBJS MACRO OBJ1, OBJ2, NUM_OF_PX
+	LEA SI, OBJ1
+	LEA DI, OBJ2
+	MOV CX, NUM_OF_PX
+	REPE CMPSB
+ENDM
 
-   mov  ax, dx
-   xor  dx, dx
-   mov  cx, 10    
-   div  cx       ; here dx contains the remainder of the division - from 0 to 9
-   
-   ;add  dl, '0'  ; to ascii from '0' to '9'
-   ;mov ah, 2h   ; call interrupt to display a value in DL
-   ;int 21h    
-   RET 
-ENDP 
-
-Draw_Rand_Box Proc 
-    
-   ReGenRand1:
-
-    call RandGen
-	Mov Ax, 80
-	Mul dl
-    Sub Ax, 45
-
-    cmp Ax, 640
-	JNC ReGenRand1
-
-    Mov x, Ax
-
-    ReGenRand2:
-
-    call RandGen
-	Mov Ax, 43
-    Mul dl
-	sub Ax, 23
-
-	cmp Ax, 350
-	JNC ReGenRand2
-
-	Mov y, AX
-
-	DRAW_FILLED_CUBOID x, y , 15, 12, 15
-
-	RET 
+STORE_IMG_RELATIVE PROC
+	MOV CX, X_POS
+	SUB CX, 9
+	MOV DX, Y_POS
+	SUB DX, 7
+	MOV TEMP_X, CX
+	MOV TEMP_Y, DX
+	STORE_IMG_16 TEMP_X, TEMP_Y
+	RET
 ENDP
 
 MAIN PROC FAR
 	MOV AX, @DATA
 	MOV DS, AX
+	MOV ES, AX
 	
 	CALL CHANGE_TO_VIDEO
 	CALL DRAW_GRID
@@ -731,6 +749,13 @@ MAIN PROC FAR
 				CLEAR_PLAYER X_POS, Y_POS
 				MOV DX, STEPY
 				SUB Y_POS, DX
+
+			CALL STORE_IMG_RELATIVE
+
+			; This is changable according to what you want to do 
+				COMPARE_OBJS TEMP_IMG_16, DOLLAR, 256
+				JE SKIP1
+			;----------------------------------------------------
 				DRAW_PLAYER PLAYER_IMG, X_POS, Y_POS
 			JMP INFINITE
 SKIP1:
@@ -746,6 +771,9 @@ SKIP1:
 				CLEAR_PLAYER X_POS, Y_POS
 				MOV DX, STEPX
 				SUB X_POS, DX
+
+				CALL STORE_IMG_RELATIVE
+
 				DRAW_PLAYER PLAYER_IMG, X_POS, Y_POS
 			JMP INFINITE
 SKIP2:
@@ -759,6 +787,9 @@ SKIP2:
 				CLEAR_PLAYER X_POS, Y_POS
 				MOV DX, STEPX
 				ADD X_POS, DX
+
+				CALL STORE_IMG_RELATIVE
+
 				DRAW_PLAYER PLAYER_IMG, X_POS, Y_POS
 			JMP INFINITE
 SKIP3:
@@ -780,6 +811,9 @@ SKIP3:
 				CLEAR_PLAYER X_POS, Y_POS
 				MOV DX, STEPY
 				ADD Y_POS, DX
+
+				CALL STORE_IMG_RELATIVE
+
 				DRAW_PLAYER PLAYER_IMG, X_POS, Y_POS
 			JMP INFINITE
 SKIP4:
@@ -795,7 +829,7 @@ SKIP4:
 				CMP Y_POS2, DX
 				JLE SKIP5
 
-				
+
 				; MOV DX, Y_POS
 				; SUB DX, IMG_HEIGHT
 				; SUB DX, 5
@@ -810,6 +844,9 @@ SKIP4:
 				CLEAR_PLAYER X_POS2, Y_POS2
 				MOV DX, STEPY2
 				SUB Y_POS2, DX
+
+				CALL STORE_IMG_RELATIVE
+
 				DRAW_PLAYER PLAYER_IMG2, X_POS2, Y_POS2
 			JMP INFINITE
 SKIP5:
@@ -825,6 +862,9 @@ SKIP5:
 				CLEAR_PLAYER X_POS2, Y_POS2
 				MOV DX, STEPX2
 				SUB X_POS2, DX
+
+				CALL STORE_IMG_RELATIVE
+
 				DRAW_PLAYER PLAYER_IMG2, X_POS2, Y_POS2
 			JMP INFINITE
 SKIP6:
@@ -838,6 +878,9 @@ SKIP6:
 				CLEAR_PLAYER X_POS2, Y_POS2
 				MOV DX, STEPX2
 				ADD X_POS2, DX
+
+				CALL STORE_IMG_RELATIVE
+
 				DRAW_PLAYER PLAYER_IMG2, X_POS2, Y_POS2
 			JMP INFINITE
 SKIP7:
@@ -851,6 +894,9 @@ SKIP7:
 				CLEAR_PLAYER X_POS2, Y_POS2
 				MOV DX, STEPY2
 				ADD Y_POS2, DX
+
+				CALL STORE_IMG_RELATIVE
+
 				DRAW_PLAYER PLAYER_IMG2, X_POS2, Y_POS2
 			JMP INFINITE
 SKIP8:

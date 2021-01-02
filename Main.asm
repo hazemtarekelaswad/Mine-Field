@@ -64,8 +64,8 @@ PIKA DB 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 
  DB 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16
 
 ;dollar.bmp data
-IMG_WID3 equ 16
-IMG_HEIGHT3 equ 16
+IMG_WID3 EQU 16
+IMG_HEIGHT3 EQU 16
 DOLLAR DB 0, 0, 0, 0, 66, 66, 66, 66, 66, 66, 66, 66, 0, 0, 0, 0, 0, 0, 44, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 44, 0, 0, 0, 44, 66, 66, 66, 66, 14, 14 
  DB 14, 14, 66, 66, 66, 66, 44, 0, 0, 66, 66, 66, 14, 14, 14, 14, 14, 14, 14, 14, 66, 66, 66, 0, 66, 66, 66, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 66, 66, 66 
  DB 66, 66, 66, 14, 14, 14, 14, 66, 66, 14, 14, 14, 14, 66, 66, 66, 66, 66, 14, 14, 14, 14, 66, 14, 14, 66, 14, 14, 14, 14, 66, 66, 66, 66, 14, 14, 14, 14, 14, 14 
@@ -73,6 +73,15 @@ DOLLAR DB 0, 0, 0, 0, 66, 66, 66, 66, 66, 66, 66, 66, 0, 0, 0, 0, 0, 0, 44, 66, 
  DB 66, 66, 66, 14, 14, 14, 14, 66, 66, 14, 14, 14, 14, 66, 66, 66, 66, 66, 66, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 66, 66, 66, 0, 66, 66, 66, 14, 14, 14, 14 
  DB 14, 14, 14, 14, 66, 66, 66, 0, 0, 44, 66, 66, 66, 66, 14, 14, 14, 14, 66, 66, 66, 66, 44, 0, 0, 0, 44, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 44, 0, 0 
  DB 0, 0, 0, 0, 66, 66, 66, 66, 66, 66, 66, 66, 0, 0, 0, 0
+
+TEMP_WID_16		DB 16
+TEMP_HEIGHT_16	DB 16
+TEMP_IMG_16		DB 256 DUP(?)
+
+TEMP_WID_32		DB 32
+TEMP_HEIGHT_32	DB 32
+TEMP_IMG_32		DB 1024 DUP(?)
+
 
 ; First Player's image, initial position and speed
 PLAYER_IMG EQU MEO		; The name is defined above
@@ -311,7 +320,7 @@ ENDP
 ; This macro does not accept X = 0 or Y = 0 as parameters
 ; It is recommended that X >= IMG_WID and Y >= IMG_HEIGHT
 ; X and Y are 16-bit values, so don't use 8-bit general registers
-DRAW_PLAYER MACRO PLAYER_IMG, X, Y, WID, HEIGHT
+DRAW_IMAGE MACRO PLAYER_IMG, X, Y, WID, HEIGHT
 LOCAL START, DRAW
 	MOV CX, X
 
@@ -546,7 +555,11 @@ endm
 ; initial X of coins 47
 ; initial Y of coins 30
 DRAW_COIN_IMG MACRO X, Y
-	DRAW_PLAYER DOLLAR, X, Y, IMG_WID3, IMG_HEIGHT3
+	DRAW_IMAGE DOLLAR, X, Y, IMG_WID3, IMG_HEIGHT3
+ENDM
+
+DRAW_PLAYER MACRO PLAYER_IMG, X, Y
+	DRAW_IMAGE PLAYER_IMG, X, Y, IMG_WID, IMG_HEIGHT
 ENDM
 
 CLEAR_SCREEN PROC
@@ -600,14 +613,89 @@ EXISTS:
 FINISHED:
 ENDM
 
+STORE_IMG MACRO X, Y
+LOCAL X_POS, Y_POS
+	MOV AH, 0DH
+	MOV CX, X
+	MOV DX, Y
+
+	MOV BX, X
+
+	MOV SI, CX
+	SUB SI, TEMP_WID_16
+
+	MOV DI, DX
+	SUB DI, TEMP_HEIGHT_16
+	
+	X_POS:
+		Y_POS:
+			INT 10H
+			MOV TEMP_IMG_16, AL
+			DEC CX
+			CMP CX, SI
+		JNE Y_POS
+
+		MOV CX, BX
+		DEC DX
+		CMP DX, DI
+	JNE X_POS
+ENDM
+
+RandGen Proc
+   ; A procedure which produce a random value in dx 
+   MOV AH, 00h  ; interrupts to get system time        
+   INT 1AH      ; CX:DX now hold number of clock ticks since midnight      
+
+   mov  ax, dx
+   xor  dx, dx
+   mov  cx, 10    
+   div  cx       ; here dx contains the remainder of the division - from 0 to 9
+   
+   ;add  dl, '0'  ; to ascii from '0' to '9'
+   ;mov ah, 2h   ; call interrupt to display a value in DL
+   ;int 21h    
+   RET 
+ENDP 
+
+Draw_Rand_Box Proc 
+    
+   ReGenRand1:
+
+    call RandGen
+	Mov Ax, 80
+	Mul dl
+    Sub Ax, 45
+
+    cmp Ax, 640
+	JNC ReGenRand1
+
+    Mov x, Ax
+
+    ReGenRand2:
+
+    call RandGen
+	Mov Ax, 43
+    Mul dl
+	sub Ax, 23
+
+	cmp Ax, 350
+	JNC ReGenRand2
+
+	Mov y, AX
+
+	DRAW_FILLED_CUBOID x, y , 15, 12, 15
+
+	RET 
+ENDP
+
 MAIN PROC FAR
 	MOV AX, @DATA
 	MOV DS, AX
 	
 	CALL CHANGE_TO_VIDEO
 	CALL DRAW_GRID
-	DRAW_PLAYER PLAYER_IMG, X_POS, Y_POS, IMG_WID, IMG_HEIGHT
-	DRAW_PLAYER PLAYER_IMG2, X_POS2, Y_POS2, IMG_WID2, IMG_HEIGHT2
+	DRAW_PLAYER PLAYER_IMG, X_POS, Y_POS
+	DRAW_PLAYER PLAYER_IMG2, X_POS2, Y_POS2
 
 	DRAW_FILLED_CUBOID 30, 15, 15, 12, 15
 	DRAW_FILLED_CUBOID 110, 144, 15, 12, 15
@@ -643,7 +731,7 @@ MAIN PROC FAR
 				CLEAR_PLAYER X_POS, Y_POS
 				MOV DX, STEPY
 				SUB Y_POS, DX
-				DRAW_PLAYER PLAYER_IMG, X_POS, Y_POS, IMG_WID, IMG_HEIGHT
+				DRAW_PLAYER PLAYER_IMG, X_POS, Y_POS
 			JMP INFINITE
 SKIP1:
 			LEFT_ARROW:
@@ -658,7 +746,7 @@ SKIP1:
 				CLEAR_PLAYER X_POS, Y_POS
 				MOV DX, STEPX
 				SUB X_POS, DX
-				DRAW_PLAYER PLAYER_IMG, X_POS, Y_POS, IMG_WID, IMG_HEIGHT
+				DRAW_PLAYER PLAYER_IMG, X_POS, Y_POS
 			JMP INFINITE
 SKIP2:
 			RIGHT_ARROW:
@@ -671,7 +759,7 @@ SKIP2:
 				CLEAR_PLAYER X_POS, Y_POS
 				MOV DX, STEPX
 				ADD X_POS, DX
-				DRAW_PLAYER PLAYER_IMG, X_POS, Y_POS, IMG_WID, IMG_HEIGHT
+				DRAW_PLAYER PLAYER_IMG, X_POS, Y_POS
 			JMP INFINITE
 SKIP3:
 			DOWN_ARROW:
@@ -681,18 +769,18 @@ SKIP3:
 				CMP Y_POS, 300		; Depends on the video mode and screen dim
 				JGE SKIP4
 
-				MOV DX, Y_POS
-				ADD DX, 6
-				MOV CX, X_POS
-				SUB CX, 56
-				CONTAINS CX, DX, 14
-				CMP CONTAINS_FLAG, 1
-				JE SKIP4
+				; MOV DX, Y_POS
+				; ADD DX, 6
+				; MOV CX, X_POS
+				; SUB CX, 56
+				; CONTAINS CX, DX, 1
+				; CMP CONTAINS_FLAG, 1
+				; JE SKIP4
 
 				CLEAR_PLAYER X_POS, Y_POS
 				MOV DX, STEPY
 				ADD Y_POS, DX
-				DRAW_PLAYER PLAYER_IMG, X_POS, Y_POS, IMG_WID, IMG_HEIGHT
+				DRAW_PLAYER PLAYER_IMG, X_POS, Y_POS
 			JMP INFINITE
 SKIP4:
 
@@ -707,6 +795,7 @@ SKIP4:
 				CMP Y_POS2, DX
 				JLE SKIP5
 
+				
 				; MOV DX, Y_POS
 				; SUB DX, IMG_HEIGHT
 				; SUB DX, 5
@@ -721,7 +810,7 @@ SKIP4:
 				CLEAR_PLAYER X_POS2, Y_POS2
 				MOV DX, STEPY2
 				SUB Y_POS2, DX
-				DRAW_PLAYER PLAYER_IMG2, X_POS2, Y_POS2, IMG_WID2, IMG_HEIGHT2
+				DRAW_PLAYER PLAYER_IMG2, X_POS2, Y_POS2
 			JMP INFINITE
 SKIP5:
 			A_KEY:
@@ -736,7 +825,7 @@ SKIP5:
 				CLEAR_PLAYER X_POS2, Y_POS2
 				MOV DX, STEPX2
 				SUB X_POS2, DX
-				DRAW_PLAYER PLAYER_IMG2, X_POS2, Y_POS2, IMG_WID2, IMG_HEIGHT2
+				DRAW_PLAYER PLAYER_IMG2, X_POS2, Y_POS2
 			JMP INFINITE
 SKIP6:
 			D_KEY:
@@ -749,7 +838,7 @@ SKIP6:
 				CLEAR_PLAYER X_POS2, Y_POS2
 				MOV DX, STEPX2
 				ADD X_POS2, DX
-				DRAW_PLAYER PLAYER_IMG2, X_POS2, Y_POS2, IMG_WID2, IMG_HEIGHT2
+				DRAW_PLAYER PLAYER_IMG2, X_POS2, Y_POS2
 			JMP INFINITE
 SKIP7:
 			S_KEY:
@@ -762,7 +851,7 @@ SKIP7:
 				CLEAR_PLAYER X_POS2, Y_POS2
 				MOV DX, STEPY2
 				ADD Y_POS2, DX
-				DRAW_PLAYER PLAYER_IMG2, X_POS2, Y_POS2, IMG_WID2, IMG_HEIGHT2
+				DRAW_PLAYER PLAYER_IMG2, X_POS2, Y_POS2
 			JMP INFINITE
 SKIP8:
 	JMP INFINITE

@@ -36,7 +36,7 @@ MEO DB 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 ; Pika.bmp data
 IMG_WID2 EQU 32
 IMG_HEIGHT2 EQU 32
-PIKA DB 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16 
+ PIKA  DB 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16 
  DB 16, 16, 16, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 245, 244, 244, 244, 20, 21, 166, 164 
  DB 164, 165, 167, 20, 20, 20, 21, 20, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 19, 244, 244, 20, 164, 66, 14, 14, 14, 14, 14, 14, 14, 67, 66, 24, 21, 21 
  DB 21, 20, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 245, 244, 20, 25, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 67, 26, 21, 21, 21, 16, 16, 16, 16, 16 
@@ -72,6 +72,15 @@ TEMP_WID_16		DW 16
 TEMP_HEIGHT_16	DW 16
 TEMP_IMG_16		DB 256 DUP(?)
 
+TEMP_WID_32		DW 32
+TEMP_HEIGHT_32	DW 32
+TEMP_IMG_32		DB 1024 DUP(?)
+
+TEMP_WID		DW 27
+TEMP_HEIGHT		DW 22
+TEMP_BOX		DB 594 DUP(?)
+
+
 TEMP_X DW ?
 TEMP_Y DW ?
 
@@ -85,12 +94,16 @@ STEPY  	DW 43			; Step in vertical direction
 ; Second Player's image, initial position and speed
 PLAYER_IMG2 EQU PIKA
 X_POS2 	DW 56
-Y_POS2 	DW 337
+Y_POS2 	DW 338
 STEPX2  DW 80
 STEPY2  DW 43
 
 X_RAND	DW ?
 Y_RAND  DW ?
+
+SCORE_MSG DB ':Score:', '$'
+SCORE_P1 DB "0"
+SCORE_P2 DB "0"
 
 CONTAINS_FLAG	DB 0
 
@@ -412,7 +425,8 @@ LOCAL DRAW_WID, DRAW_LEN, DRAW_HEIGHT, RIGHT, TOP
 
     MOV CX, X           ; X-Pos
     MOV DX, Y           ; Y-Pos
-    MOV AX, 0C0CH       ; AH: Draw Pixel | AL: Color
+    MOV AH, 0CH       ; AH: Draw Pixel | AL: Color
+	MOV AL, 0EH 
 
     DRAW_RECT X, Y, LEN, HEIGHT
 
@@ -453,11 +467,12 @@ LOCAL DRAW_WID, DRAW_LEN, DRAW_HEIGHT, RIGHT, TOP
 
 ENDM
 
-DRAW_FILLED_RECT MACRO X, Y, LEN, WID
+DRAW_FILLED_RECT MACRO X, Y, LEN, WID, COLOR
 LOCAL DRAW_WID, DRAW_LEN, FILL
     MOV CX, X           ; X-Pos
     MOV DX, Y           ; Y-Pos
-    MOV AX, 0C09H       ; AH: Draw Pixel | AL: Color
+    MOV AH, 0CH       ; AH: Draw Pixel | AL: Color
+	MOV AL, COLOR
 
     ; Draw the right and left sides
     MOV BX, WID
@@ -477,15 +492,18 @@ LOCAL DRAW_WID, DRAW_LEN, FILL
     JNE DRAW_WID
 ENDM
 
-DRAW_FILLED_CUBOID MACRO X, Y, LEN, WID, HEIGHT
+DRAW_FILLED_CUBOID MACRO X, Y, LEN, WID, HEIGHT, COLOR
 LOCAL DRAW, FILL_HEIGHT, FILL_LEN
 
     MOV CX, X           ; X-Pos
     MOV DX, Y           ; Y-Pos
-    MOV AX, 0C01H       ; AH: Draw Pixel
-
+    MOV AH, 0CH       ; AH: Draw Pixel
+	MOV AL, COLOR
 ; To draw the front side
-    DRAW_FILLED_RECT X, Y, LEN, HEIGHT
+
+	MOV BL, COLOR
+	ADD BL, 8
+    DRAW_FILLED_RECT X, Y, LEN, HEIGHT, BL
 
     ADD CX, LEN     ; Reset X-Pos and Y-Pos to the bottom right corner
     DEC DX
@@ -496,7 +514,7 @@ LOCAL DRAW, FILL_HEIGHT, FILL_LEN
     SHR SI, 1
     SUB BX, SI
 
-    MOV AL, 1             ; Color of Top and Left sides
+    MOV AL, COLOR             ; Color of Top and Left sides
 
     DRAW:
 ; To fill the right side of the cuboid
@@ -572,7 +590,7 @@ CHANGE_TO_VIDEO PROC
 	RET
 ENDP
 
-RandGen Proc
+RandGen PROC
    ; A procedure which produce a random value in dx 
    MOV AH, 00h  ; interrupts to get system time        
    INT 1AH      ; CX:DX now hold number of clock ticks since midnight      
@@ -585,10 +603,10 @@ RandGen Proc
    ;add  dl, '0'  ; to ascii from '0' to '9'
    ;mov ah, 2h   ; call interrupt to display a value in DL
    ;int 21h    
-   RET 
+	RET
 ENDP
     
-Draw_Rand_Box Proc 
+Draw_Rand_Box PROC 
     
    ReGenRand1:
 
@@ -614,7 +632,7 @@ Draw_Rand_Box Proc
 
 	Mov Y_RAND, AX
 
-	DRAW_FILLED_CUBOID X_RAND, Y_RAND , 15, 12, 15
+	DRAW_FILLED_CUBOID X_RAND, Y_RAND , 15, 12, 15, 1
 
 	RET 
 ENDP
@@ -655,18 +673,18 @@ EXISTS:
 FINISHED:
 ENDM
 
-; Don't pass registers, and don't ask for the shitty reason because I don't f know
+; Don't pass registers
 STORE_IMG_16 MACRO X, Y
 LOCAL STORE, START
 	MOV CX, X
 
 	MOV SI, X
-	SUB SI, TEMP_WID_16
+	SUB SI, 16
 
 	MOV DX, Y
 
 	MOV DI, Y
-	SUB DI, TEMP_HEIGHT_16
+	SUB DI, 16
 
 	LEA BX, TEMP_IMG_16
 	JMP START
@@ -686,7 +704,68 @@ LOCAL STORE, START
 	JNE STORE 
 ENDM
 
-; Sets ZF if they are diff, resets ZF if they are the same
+STORE_IMG_32 MACRO X, Y
+LOCAL STORE, START
+	MOV CX, X
+	
+	MOV SI, X
+	SUB SI, 32
+
+	MOV DX, Y
+
+	MOV DI, Y
+	SUB DI, 32
+
+	LEA BX, TEMP_IMG_32
+	JMP START
+
+	STORE:
+		MOV AH, 0DH
+		INT 10H
+		MOV [BX], AL   
+	START:
+		INC BX
+	    DEC CX       
+		CMP CX, SI
+	JNE STORE   
+		MOV CX, X  
+	    DEC DX     
+		CMP DX, DI
+	JNE STORE 
+ENDM
+
+STORE_BOX MACRO X, Y
+	LOCAL Y_POS, X_POS
+
+    MOV CX, X           ; X-Pos
+    MOV DX, Y           ; Y-Pos
+
+	MOV SI, X
+	ADD SI, TEMP_WID
+
+	MOV DI, Y
+	ADD DI, TEMP_HEIGHT
+
+	MOV AH, 0DH
+
+	LEA BX, TEMP_BOX
+
+	Y_POS:
+		X_POS:
+			INT 10H
+			MOV [BX], AL
+			INC BX
+			INC CX
+			CMP CX, SI
+		JLE X_POS
+
+		MOV CX, X
+		INC DX
+		CMP DX, DI
+	JLE Y_POS
+ENDM
+
+; Use JE or JNE to after comparing if needed
 COMPARE_OBJS MACRO OBJ1, OBJ2, NUM_OF_PX
 	LEA SI, OBJ1
 	LEA DI, OBJ2
@@ -705,22 +784,78 @@ STORE_IMG_RELATIVE PROC
 	RET
 ENDP
 
+DISPLAY_WORD_SCORE PROC 
+    MOV AH,13H 					;To print string in the graphical mode
+    MOV AL,0 					;To make all the characters be in the same color
+    MOV BH,0 					;Page number= zero (always)
+    MOV BL,0FH 					;Color of the text (white foreground and black background)
+    MOV CX,7 					;Length of the string to be printed 
+    MOV DH,22 					;Y coordinate
+    MOV DL,35 					;X coordinate
+    MOV BP,OFFSET SCORE_MSG 	;Moves to bp the offset of the string
+    INT 10H
+    RET
+ ENDP 
+
+CALC_SCORE MACRO X, Y    
+        MOV CX, X
+		SUB CX, 9
+		MOV DX, Y
+		SUB DX, 7
+	;	MOV TEMP_X, CX
+	;	MOV TEMP_Y, DX
+		STORE_IMG_16 CX, DX
+        COMPARE_OBJS DOLLAR, TEMP_IMG_16, 256
+        JNE TERMINATE
+		MOV SI, X 
+        cmp SI, X_pos
+        JNE Calc_2
+
+        INC SCORE_P1
+	    JMP TERMINATE
+
+	Calc_2: 
+		Inc SCORE_P2
+
+        TERMINATE: 
+ENDM
+
+DISPLAY_SCORE MACRO Score
+	Mov cx,1
+	MOV BH,0 				; Page number = zero (always)
+    MOV BL,0FH 				; White color
+	MOV DH,22 				; Y coordinate
+    MOV DL,30 				; X coordinate
+	MOV BP, OFFSET Score
+	INT 10H
+ENDM
+
 MAIN PROC FAR
 	MOV AX, @DATA
 	MOV DS, AX
 	MOV ES, AX
 	
+	; Hide the mouse pointer
+	MOV AX, 1
+	INT 33H
+	MOV AX, 2
+	INT 33H
+
 	CALL CHANGE_TO_VIDEO
 	CALL DRAW_GRID
+	CALL DISPLAY_WORD_SCORE
+	DISPLAY_SCORE SCORE_P1
+	DISPLAY_SCORE SCORE_P2
+	
 	DRAW_PLAYER PLAYER_IMG, X_POS, Y_POS
 	DRAW_PLAYER PLAYER_IMG2, X_POS2, Y_POS2
 
-	DRAW_FILLED_CUBOID 30, 15, 15, 12, 15
-	DRAW_FILLED_CUBOID 110, 144, 15, 12, 15
-	DRAW_FILLED_CUBOID 350, 58, 15, 12, 15
-	DRAW_FILLED_CUBOID 510, 187, 15, 12, 15
-	DRAW_FILLED_CUBOID 350, 236, 15, 12, 15
-	DRAW_FILLED_CUBOID 590, 322, 15, 12, 15
+	DRAW_FILLED_CUBOID 30, 15, 16, 12, 16, 1
+	; DRAW_FILLED_CUBOID 110, 144, 15, 12, 15, 0EH
+	; DRAW_FILLED_CUBOID 350, 58, 15, 12, 15, 0EH
+	; DRAW_FILLED_CUBOID 510, 187, 15, 12, 15, 0EH
+	; DRAW_FILLED_CUBOID 350, 236, 15, 12, 15, 0EH
+	; DRAW_FILLED_CUBOID 590, 322, 15, 12, 15, 0EH
 	DRAW_COIN_IMG 127, 30
 
 	
@@ -745,17 +880,19 @@ MAIN PROC FAR
 				CMP Y_POS, DX
 				JLE SKIP1 
 
+			; Checks if the other player located in the above cell
+				; MOV DX, Y_POS
+				; SUB DX, IMG_HEIGHT
+				; SUB DX, 11
+				; MOV TEMP_Y, DX
+				; STORE_IMG_32 56, 338; X_POS, TEMP_Y
+				; COMPARE_OBJS TEMP_IMG_32, PLAYER_IMG2, 1024
+				; JE SKIP1
+
 			; Lets the player move by STEPY 
 				CLEAR_PLAYER X_POS, Y_POS
 				MOV DX, STEPY
 				SUB Y_POS, DX
-
-			CALL STORE_IMG_RELATIVE
-
-			; This is changable according to what you want to do 
-				COMPARE_OBJS TEMP_IMG_16, DOLLAR, 256
-				JE SKIP1
-			;----------------------------------------------------
 				DRAW_PLAYER PLAYER_IMG, X_POS, Y_POS
 			JMP INFINITE
 SKIP1:
@@ -768,12 +905,17 @@ SKIP1:
 				CMP X_POS, DX
 				JLE SKIP2
 
+				; MOV CX, X_POS
+				; SUB CX, IMG_WID
+				; SUB CX, 48
+				; MOV TEMP_X, CX
+				; STORE_IMG_32 56, 338
+				; COMPARE_OBJS TEMP_IMG_32, PLAYER_IMG2, 1024
+				; JE SKIP2
+
 				CLEAR_PLAYER X_POS, Y_POS
 				MOV DX, STEPX
 				SUB X_POS, DX
-
-				CALL STORE_IMG_RELATIVE
-
 				DRAW_PLAYER PLAYER_IMG, X_POS, Y_POS
 			JMP INFINITE
 SKIP2:
@@ -784,12 +926,17 @@ SKIP2:
 				CMP X_POS, 600		; Depends on the video mode and screen dim
 				JGE SKIP3
 
+				; MOV CX, X_POS
+				; ADD CX, IMG_WID
+				; ADD CX, 48
+				; MOV TEMP_X, CX
+				; STORE_IMG_32 TEMP_X, Y_POS
+				; COMPARE_OBJS TEMP_IMG_32, PLAYER_IMG, 1024
+				; JE SKIP3
+
 				CLEAR_PLAYER X_POS, Y_POS
 				MOV DX, STEPX
 				ADD X_POS, DX
-
-				CALL STORE_IMG_RELATIVE
-
 				DRAW_PLAYER PLAYER_IMG, X_POS, Y_POS
 			JMP INFINITE
 SKIP3:
@@ -801,19 +948,16 @@ SKIP3:
 				JGE SKIP4
 
 				; MOV DX, Y_POS
-				; ADD DX, 6
-				; MOV CX, X_POS
-				; SUB CX, 56
-				; CONTAINS CX, DX, 1
-				; CMP CONTAINS_FLAG, 1
+				; ADD DX, IMG_HEIGHT
+				; ADD DX, 11
+				; MOV TEMP_Y, DX
+				; STORE_IMG_32 X_POS, TEMP_Y
+				; COMPARE_OBJS TEMP_IMG_32, PLAYER_IMG2, 1024
 				; JE SKIP4
 
 				CLEAR_PLAYER X_POS, Y_POS
 				MOV DX, STEPY
 				ADD Y_POS, DX
-
-				CALL STORE_IMG_RELATIVE
-
 				DRAW_PLAYER PLAYER_IMG, X_POS, Y_POS
 			JMP INFINITE
 SKIP4:
@@ -829,24 +973,17 @@ SKIP4:
 				CMP Y_POS2, DX
 				JLE SKIP5
 
-
-				; MOV DX, Y_POS
-				; SUB DX, IMG_HEIGHT
-				; SUB DX, 5
-				; SUB DX, 43
-				; MOV CX, X_POS
-				; SUB CX, 56
-				; CONTAINS CX, DX, 90
-				; CMP CONTAINS_FLAG, 1
-				; JE SKIP5
+				MOV DX, Y_POS2
+				SUB DX, IMG_HEIGHT
+				SUB DX, 11
+				MOV TEMP_Y, DX
+				STORE_IMG_32 X_POS2, TEMP_Y
+				COMPARE_OBJS TEMP_IMG_32, PLAYER_IMG, 1024
+				JE SKIP5
 				
-
 				CLEAR_PLAYER X_POS2, Y_POS2
 				MOV DX, STEPY2
 				SUB Y_POS2, DX
-
-				CALL STORE_IMG_RELATIVE
-
 				DRAW_PLAYER PLAYER_IMG2, X_POS2, Y_POS2
 			JMP INFINITE
 SKIP5:
@@ -859,12 +996,17 @@ SKIP5:
 				CMP X_POS2, DX
 				JLE SKIP6
 
+				MOV CX, X_POS2
+				SUB CX, IMG_WID
+				SUB CX, 48
+				MOV TEMP_X, CX
+				STORE_IMG_32 TEMP_X, Y_POS2
+				COMPARE_OBJS TEMP_IMG_32, PLAYER_IMG, 1024
+				JE SKIP6
+
 				CLEAR_PLAYER X_POS2, Y_POS2
 				MOV DX, STEPX2
 				SUB X_POS2, DX
-
-				CALL STORE_IMG_RELATIVE
-
 				DRAW_PLAYER PLAYER_IMG2, X_POS2, Y_POS2
 			JMP INFINITE
 SKIP6:
@@ -875,12 +1017,17 @@ SKIP6:
 				CMP X_POS2, 600		; Depends on the video mode and screen dim
 				JGE SKIP7
 
+				MOV CX, X_POS2
+				ADD CX, IMG_WID
+				ADD CX, 48
+				MOV TEMP_X, CX
+				STORE_IMG_32 TEMP_X, Y_POS2
+				COMPARE_OBJS TEMP_IMG_32, PLAYER_IMG, 1024
+				JE SKIP7
+
 				CLEAR_PLAYER X_POS2, Y_POS2
 				MOV DX, STEPX2
 				ADD X_POS2, DX
-
-				CALL STORE_IMG_RELATIVE
-
 				DRAW_PLAYER PLAYER_IMG2, X_POS2, Y_POS2
 			JMP INFINITE
 SKIP7:
@@ -891,11 +1038,19 @@ SKIP7:
 				CMP Y_POS2, 300		; Depends on the video mode and screen dim
 				JGE SKIP8
 
+				MOV DX, Y_POS2
+				ADD DX, IMG_HEIGHT
+				ADD DX, 11
+				MOV TEMP_Y, DX
+				STORE_IMG_32 X_POS2, TEMP_Y
+				COMPARE_OBJS TEMP_IMG_32, PLAYER_IMG, 1024
+				JE SKIP8
+
 				CLEAR_PLAYER X_POS2, Y_POS2
 				MOV DX, STEPY2
 				ADD Y_POS2, DX
 
-				CALL STORE_IMG_RELATIVE
+				;CALL STORE_IMG_RELATIVE
 
 				DRAW_PLAYER PLAYER_IMG2, X_POS2, Y_POS2
 			JMP INFINITE

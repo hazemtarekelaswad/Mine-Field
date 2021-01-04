@@ -1,45 +1,99 @@
 .MODEL SMALL
 .STACK 64
 .DATA
-strResult DW 3 DUP('$') ; string buffer to store results
-
+PXS DW 0
 .CODE
-MAIN Proc far
-    mov ax, 198       ; number to be converted
-    mov cx, 10         ; divisor
-    xor bx, bx          ; count digits
 
-divide:
-    xor dx, dx        ; high part = 0
-    div cx             ; ax = dx:ax/cx, dx = remainder
-    push dx             ; DL is a digit in range [0..9]
-    inc bx              ; count digits
-    test ax, ax       ; AX is 0?
-    jnz divide          ; no, continue
+DRAW_FILLED_RECT MACRO X, Y, LEN, WID, COLOR
+LOCAL DRAW_WID, DRAW_LEN, FILL
+    MOV CX, X           ; X-Pos
+    MOV DX, Y           ; Y-Pos
+    MOV AH, 0CH       ; AH: Draw Pixel | AL: Color
+	MOV AL, COLOR
 
-    ; POP digits from stack in reverse order
-    mov cx, bx          ; number of digits
-    lea si, strResult   ; DS:SI points to string buffer
-next_digit:
-    pop ax
-    add al, '0'         ; convert to ASCII
-    mov [si], al        ; write it to the buffer
-    inc si
-    loop next_digit
+    ; Draw the right and left sides
+    MOV BX, WID
+    ADD BX, DX
+    DRAW_WID:
+        INT 10H
+        INC PXS
+        MOV DI, CX
+        ADD DI, LEN
+        FILL:
+            INC CX
+            INT 10H
+            INC PXS
+            CMP CX, DI
+        JNE FILL
+        SUB CX, LEN
+        INC DX
+        CMP DX, BX
+    JNE DRAW_WID
+ENDM
 
-    MOV AX, 4F02H
-    MOV BX, 0100H
+DRAW_FILLED_CUBOID MACRO X, Y, LEN, WID, HEIGHT, COLOR
+LOCAL DRAW, FILL_HEIGHT, FILL_LEN
+
+    MOV CX, X           ; X-Pos
+    MOV DX, Y           ; Y-Pos
+    MOV AH, 0CH       	; AH: Draw Pixel
+	MOV AL, COLOR
+
+; To draw the front side
+	MOV BL, COLOR
+	ADD BL, 8
+    DRAW_FILLED_RECT X, Y, LEN, HEIGHT, BL
+
+    ADD CX, LEN     ; Reset X-Pos and Y-Pos to the bottom right corner
+    INC CX
+    DEC DX
+
+; To calculate the stop pos of the cuboid edges 
+    MOV BX, DX
+    MOV SI, WID
+    SHR SI, 1
+    SUB BX, SI
+
+    MOV AL, COLOR             ; Color of Top and Left sides
+
+    DRAW:
     INT 10H
+; To fill the right side of the cuboid
+        INC PXS
+        MOV DI, DX
+        SUB DI, HEIGHT
+        FILL_HEIGHT:
+            DEC DX
+            INT 10H
+            INC PXS
+            CMP DX, DI
+        JNE FILL_HEIGHT
 
-    MOV AH, 13H
-	MOV AL, 0
-	Mov cx, 3
-	MOV BH,0 				; Page number = zero (always)
-    MOV BL,0FH 				; White color
-	MOV DH,22 				; Y coordinate
-    MOV DL,46				; X coordinate
-	MOV BP, OFFSET strResult
-	INT 10H
+; To fill the top side of the cuboid
+        MOV DI, CX
+        SUB DI, LEN
+        FILL_LEN:
+            DEC CX
+            INT 10H
+            INC PXS
+            CMP CX, DI
+        JNE FILL_LEN
+    
+        ADD CX, LEN
+        ADD DX, HEIGHT
+        INC CX
+        DEC DX
+        CMP DX, BX
+    JNE DRAW
+ENDM
 
-MAIN Endp
-End MAIN
+MAIN PROC FAR
+    MOV AX, @DATA
+    MOV DS, AX
+    MOV AX, 0013H
+
+    INT 10H
+    DRAW_FILLED_CUBOID 10, 10, 16, 12, 16, 2H
+    MOV DX, 0
+MAIN ENDP
+END MAIN

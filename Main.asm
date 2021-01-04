@@ -68,6 +68,35 @@ IMG_WID3 EQU 16
 IMG_HEIGHT3 EQU 16
 DOLLAR DB 0, 0, 0, 0, 66, 66, 66, 66, 66, 66, 66, 66, 0, 0, 0, 0, 0, 0, 44, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 44, 0, 0, 0, 44, 66, 66, 66, 66, 14, 14, 14, 14, 66, 66, 66, 66, 44, 0, 0, 66, 66, 66, 14, 14, 14, 14, 14, 14, 14, 14, 66, 66, 66, 0, 66, 66, 66, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 66, 66, 66, 66, 66, 66, 14, 14, 14, 14, 66, 66, 14, 14, 14, 14, 66, 66, 66, 66, 66, 14, 14, 14, 14, 66, 14, 14, 66, 14, 14, 14, 14, 66, 66, 66, 66, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 66, 66, 66, 66, 14, 14, 14, 14, 14, 14, 66, 14, 14, 14, 14, 14, 66, 66, 66, 66, 14, 14, 14, 14, 14, 14, 14, 66, 14, 14, 14, 14, 66, 66, 66, 66, 66, 14, 14, 14, 14, 66, 66, 14, 14, 14, 14, 66, 66, 66, 66, 66, 66, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 66, 66, 66, 0, 66, 66, 66, 14, 14, 14, 14, 14, 14, 14, 14, 66, 66, 66, 0, 0, 44, 66, 66, 66, 66, 14, 14, 14, 14, 66, 66, 66, 66, 44, 0, 0, 0, 44, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 44, 0, 0, 0, 0, 0, 0, 66, 66, 66, 66, 66, 66, 66, 66, 0, 0, 0, 0
 
+BLACKBOX DB 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00 
+ DB 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00 
+ DB 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00
+ DB 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00 
+ DB 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00
+ DB 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00 
+ DB 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00 
+ DB 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00
+ DB 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00 
+ DB 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00
+ DB 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00 
+ DB 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00 
+ DB 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00
+ DB 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00 
+ DB 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00
+ DB 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00 
+ DB 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00 
+ DB 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00
+ DB 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00 
+ DB 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00
+ DB 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00 
+ DB 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00 
+ DB 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00
+ DB 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00 
+ DB 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00 
+ DB 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00
+
+RED_BOX DB 
+
 TEMP_WID_16		DW 16
 TEMP_HEIGHT_16	DW 16
 TEMP_IMG_16		DB 256 DUP(?)
@@ -76,9 +105,9 @@ TEMP_WID_32		DW 32
 TEMP_HEIGHT_32	DW 32
 TEMP_IMG_32		DB 1024 DUP(?)
 
-TEMP_WID		DW 27
-TEMP_HEIGHT		DW 22
-TEMP_BOX		DB 594 DUP(?)
+TEMP_WID_BOX	DW 27
+TEMP_HEIGHT_BOX	DW 22
+TEMP_BOX		DB 470 DUP(?)
 
 
 TEMP_X DW ?
@@ -104,7 +133,6 @@ Y_RAND  DW ?
 CONTAINS_FLAG	DB 0
 
 SCORE_MSG DB ':Score:', '$'
-
 ; Score, Number of digits, Score as a string
 SCORE_P1 DW 0, ?, ?
 SCORE_P2 DW 0, ?, ?
@@ -499,10 +527,10 @@ LOCAL DRAW, FILL_HEIGHT, FILL_LEN
 
     MOV CX, X           ; X-Pos
     MOV DX, Y           ; Y-Pos
-    MOV AH, 0CH       ; AH: Draw Pixel
+    MOV AH, 0CH       	; AH: Draw Pixel
 	MOV AL, COLOR
-; To draw the front side
 
+; To draw the front side
 	MOV BL, COLOR
 	ADD BL, 8
     DRAW_FILLED_RECT X, Y, LEN, HEIGHT, BL
@@ -592,7 +620,7 @@ CHANGE_TO_VIDEO PROC
 	RET
 ENDP
 
-RandGen PROC
+RANDGEN PROC
    ; A procedure which produce a random value in dx 
    MOV AH, 00h  ; interrupts to get system time        
    INT 1AH      ; CX:DX now hold number of clock ticks since midnight      
@@ -608,7 +636,7 @@ RandGen PROC
 	RET
 ENDP
     
-Draw_Rand_Box PROC 
+DRAW_RAND_BOX PROC 
     
    ReGenRand1:
 
@@ -739,37 +767,118 @@ LOCAL STORE, START
 ENDM
 
 STORE_BOX MACRO X, Y
-	LOCAL Y_POS, X_POS
-
-    MOV CX, X           ; X-Pos
+LOCAL READ_HEIGHT, FILL, DRAW, FILL_LEN, FILL_HEIGHT
+	MOV CX, X           ; X-Pos
     MOV DX, Y           ; Y-Pos
+    MOV AH, 0DH       	; AH: Read Pixel
 
-	MOV SI, X
-	ADD SI, TEMP_WID
+; STORE RECT
+    ; READ the right and left sides
+    MOV BX, 16 ; HEIGHT
+    ADD BX, DX
 
-	MOV DI, Y
-	ADD DI, TEMP_HEIGHT
+	LEA SI, TEMP_BOX
+    READ_HEIGHT:
 
-	MOV AH, 0DH
+        INT 10H
+		MOV [SI], AL
+		INC SI
 
-	LEA BX, TEMP_BOX
+        MOV DI, CX
+        ADD DI, 16	;LENGTH
+        FILL:
+            INC CX
 
-	Y_POS:
-		X_POS:
+            INT 10H
+			MOV [SI], AL
+			INC SI
+
+            CMP CX, DI
+        JNE FILL
+        SUB CX, 16	;LENGTH
+        INC DX
+        CMP DX, BX
+    JNE READ_HEIGHT
+	PUSH SI
+
+;===================================
+    ADD CX, 16  ;LENGTH    ; Reset X-Pos and Y-Pos to the bottom right corner
+    DEC DX
+
+; To calculate the stop pos of the cuboid edges 
+    MOV BX, DX
+    MOV SI, 12  ;WIDTH
+    SHR SI, 1
+    SUB BX, SI
+
+	POP SI
+    DRAW:
+; To fill the right side of the cuboid
+        INT 10H
+		MOV [SI], AL
+		INC SI
+
+        MOV DI, DX
+        SUB DI, HEIGHT
+        FILL_HEIGHT:
+            DEC DX
+			
+            INT 10H
+			MOV [SI], AL
+			INC SI
+
+            CMP DX, DI
+        JNE FILL_HEIGHT
+
+; To fill the top side of the cuboid
+        MOV DI, CX
+        SUB DI, 16	;LENGTH
+        FILL_LEN:
+            DEC CX
+            
 			INT 10H
-			MOV [BX], AL
-			INC BX
-			INC CX
-			CMP CX, SI
-		JLE X_POS
+			MOV [SI], AL
+			INC SI
 
-		MOV CX, X
-		INC DX
-		CMP DX, DI
-	JLE Y_POS
+            CMP CX, DI
+        JNE FILL_LEN
+    
+        ADD CX, 16		; LENGTH
+        ADD DX, 16		; HEIGHT
+        INC CX
+        DEC DX
+        CMP DX, BX
+    JNE DRAW
+	
+    ; MOV CX, X           ; X-Pos
+    ; MOV DX, Y           ; Y-Pos
+
+	; MOV SI, X
+	; ADD SI, TEMP_WID
+
+	; MOV DI, Y
+	; ADD DI, TEMP_HEIGHT
+
+	; MOV AH, 0DH
+
+	; LEA BX, TEMP_BOX
+
+	; Y_POS:
+	; 	X_POS:
+	; 		INT 10H
+	; 		MOV [BX], AL
+	; 		INC BX
+	; 		INC CX
+	; 		CMP CX, SI
+	; 	JLE X_POS
+
+	; 	MOV CX, X
+	; 	INC DX
+	; 	CMP DX, DI
+	; JLE Y_POS
 ENDM
 
-; Use JE or JNE to after comparing if needed
+; Use JE or JNE after comparing, if needed
 COMPARE_OBJS MACRO OBJ1, OBJ2, NUM_OF_PX
 	LEA SI, OBJ1
 	LEA DI, OBJ2
@@ -851,7 +960,6 @@ LOCAL TERMINATE, Calc_2
     TERMINATE: 
 ENDM
 
-; X AND Y are 8-bit
 DISPLAY_SCORE_P1 PROC
 	CONVERT_TO_ASCII SCORE_P1
 	MOV AX, 1300H
@@ -901,11 +1009,13 @@ MAIN PROC FAR
 	DRAW_PLAYER PLAYER_IMG2, X_POS2, Y_POS2
 
 	DRAW_FILLED_CUBOID 30, 15, 16, 12, 16, 1
-	; DRAW_FILLED_CUBOID 110, 144, 15, 12, 15, 0EH
-	; DRAW_FILLED_CUBOID 350, 58, 15, 12, 15, 0EH
-	; DRAW_FILLED_CUBOID 510, 187, 15, 12, 15, 0EH
-	; DRAW_FILLED_CUBOID 350, 236, 15, 12, 15, 0EH
-	; DRAW_FILLED_CUBOID 590, 322, 15, 12, 15, 0EH
+	; DRAW_FILLED_CUBOID 110, 144, 16, 12, 16, 2
+	; DRAW_FILLED_CUBOID 270, 144, 16, 12, 16, 3
+	; DRAW_FILLED_CUBOID 350, 58, 16, 12, 16, 4
+	; DRAW_FILLED_CUBOID 510, 187, 16, 12, 16, 5
+	; DRAW_FILLED_CUBOID 350, 236, 16, 12, 16, 6
+	; DRAW_FILLED_CUBOID 590, 322, 16, 12, 16, 7
+
 	DRAW_COIN_IMG 127, 30
 	DRAW_COIN_IMG 127, 116
 

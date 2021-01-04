@@ -101,11 +101,13 @@ STEPY2  DW 43
 X_RAND	DW ?
 Y_RAND  DW ?
 
-SCORE_MSG DB ':Score:', '$'
-SCORE_P1 DB '0'
-SCORE_P2 DB '0'
-
 CONTAINS_FLAG	DB 0
+
+SCORE_MSG DB ':Score:', '$'
+
+; Score, Number of digits, Score as a string
+SCORE_P1 DW 0, ?, ?
+SCORE_P2 DW 0, ?, ?
 
 .CODE
 
@@ -786,6 +788,32 @@ STORE_IMG_RELATIVE PROC
 	RET
 ENDP
 
+CONVERT_TO_ASCII MACRO SCORE
+LOCAL next_digit, divide
+	mov ax, SCORE       ; number to be converted
+    mov cx, 10         	; divisor
+    xor bx, bx          ; count digits
+
+divide:
+    xor dx, dx        ; high part = 0
+    div cx             ; ax = dx:ax/cx, dx = remainder
+    push dx             ; DL is a digit in range [0..9]
+    inc bx              ; count digits
+    test ax, ax       ; AX is 0?
+    jnz divide          ; no, continue
+
+    ; POP digits from stack in reverse order
+    mov cx, bx          ; number of digits
+	MOV SCORE+2, BX
+    lea si, SCORE+4   ; DS:SI points to string buffer
+next_digit:
+    pop ax
+    add al, '0'           ; convert to ASCII
+    mov [SI], al        ; write it to the buffer
+    inc si
+    loop next_digit
+ENDM
+
 DISPLAY_WORD_SCORE PROC 
     MOV AH,13H 					;To print string in the graphical mode
     MOV AL,0 					;To make all the characters be in the same color
@@ -807,44 +835,45 @@ LOCAL TERMINATE, Calc_2
 		SUB DX, 7
 		MOV TEMP_X, CX
 		MOV TEMP_Y, DX
+
 		STORE_IMG_16 TEMP_X, TEMP_Y
         COMPARE_OBJS DOLLAR, TEMP_IMG_16, 254
         JNE TERMINATE
 
 		MOV SI, X 
-        cmp SI, X_pos
-        JNE Calc_2
+        CMP SI, X_POS
+        JNE CALC_2
 
         INC SCORE_P1
 	    JMP TERMINATE
-
 	CALC_2: 
-		Inc SCORE_P2
-
+		INC SCORE_P2
     TERMINATE: 
 ENDM
 
 ; X AND Y are 8-bit
 DISPLAY_SCORE_P1 PROC
+	CONVERT_TO_ASCII SCORE_P1
 	MOV AX, 1300H
-	Mov cx,1
+	Mov cx, SCORE_P1+2
 	MOV BH,0 				; Page number = zero (always)
     MOV BL,0FH 				; White color
 	MOV DH,22 				; Y coordinate
     MOV DL,46				; X coordinate
-	MOV BP, OFFSET SCORE_P1
+	MOV BP, OFFSET SCORE_P1+4
 	INT 10H
 	RET
 ENDP
 
 DISPLAY_SCORE_P2 PROC
+	CONVERT_TO_ASCII SCORE_P2
 	MOV AX, 1300H
-	Mov cx,1
+	Mov cx, SCORE_P2+2
 	MOV BH,0 				; Page number = zero (always)
     MOV BL,0FH 				; White color
 	MOV DH,22 				; Y coordinate
     MOV DL,30				; X coordinate
-	MOV BP, OFFSET SCORE_P2
+	MOV BP, OFFSET SCORE_P2+4
 	INT 10H
 	RET
 ENDP
@@ -864,6 +893,7 @@ MAIN PROC FAR
 	CALL DRAW_GRID
 
 	CALL DISPLAY_WORD_SCORE
+
 	CALL DISPLAY_SCORE_P1
 	CALL DISPLAY_SCORE_P2
 

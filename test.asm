@@ -1,57 +1,45 @@
-DRAW_RECT PROC
-    PUSH BP
-    MOV BP, SP
-    ADD BP, 4
+.MODEL SMALL
+.STACK 64
+.DATA
+strResult DW 3 DUP('$') ; string buffer to store results
 
-; [BP]   --> Y-Pos of the top left corner
-; [BP+2] --> X-Pos of the top left corner
-; [BP+4] --> Width
-; [BP+6] --> Length
+.CODE
+MAIN Proc far
+    mov ax, 198       ; number to be converted
+    mov cx, 10         ; divisor
+    xor bx, bx          ; count digits
 
-    MOV CX, [BP+2]      ; X-Pos
-    MOV DX, [BP]        ; Y-Pos
-    MOV AX, 0C0EH       ; AH: Draw Pixel | AL: Color
+divide:
+    xor dx, dx        ; high part = 0
+    div cx             ; ax = dx:ax/cx, dx = remainder
+    push dx             ; DL is a digit in range [0..9]
+    inc bx              ; count digits
+    test ax, ax       ; AX is 0?
+    jnz divide          ; no, continue
 
-; Draw the right and left sides
-    MOV BX, [BP+4]
-    ADD BX, DX
-    WID:
-        INT 10H
-        ADD CX, [BP+6]
-        INT 10H
-        SUB CX, [BP+6]
-        INC DX
-        CMP DX, BX
-    JNE WID
+    ; POP digits from stack in reverse order
+    mov cx, bx          ; number of digits
+    lea si, strResult   ; DS:SI points to string buffer
+next_digit:
+    pop ax
+    add al, '0'         ; convert to ASCII
+    mov [si], al        ; write it to the buffer
+    inc si
+    loop next_digit
 
-; Draw the top and bottom sides
-    MOV BX, [BP+6]
-    ADD BX, CX
-    LEN:
-        INT 10H
-        SUB DX, [BP+4]
-        INT 10H
-        ADD DX, [BP+4]
-        INC CX
-        CMP CX, BX
-    JNE LEN
+    MOV AX, 4F02H
+    MOV BX, 0100H
     INT 10H
 
-    POP BP
-    RET
-DRAW_RECT ENDP
+    MOV AH, 13H
+	MOV AL, 0
+	Mov cx, 3
+	MOV BH,0 				; Page number = zero (always)
+    MOV BL,0FH 				; White color
+	MOV DH,22 				; Y coordinate
+    MOV DL,46				; X coordinate
+	MOV BP, OFFSET strResult
+	INT 10H
 
-MAIN PROC FAR
-; Change to video mode
-    MOV AX, 0013H
-    INT 10H
-
-   PUSH 8        ; Length
-   PUSH 8        ; Width
-   PUSH 160      ; X-Pos
-   PUSH 100      ; Y-Pos
-   CALL DRAW_RECT
-   ADD SP, 8   ; Number of Parameters * 2
-
-MAIN ENDP
-END MAIN
+MAIN Endp
+End MAIN

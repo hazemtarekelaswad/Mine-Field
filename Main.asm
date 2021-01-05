@@ -76,7 +76,7 @@ BLUE_BOX 		DB 470 DUP(9)
 GREEN_BOX 		DB 470 DUP(10)	; Decreases other player's score by 20
 AQUA_BOX 		DB 470 DUP(11)	
 RED_BOX 		DB 470 DUP(12)	; Resets player's score
-PURPLE_BOX 		DB 470 DUP(13)	; Lets player choose a feature to proceed
+PURPLE_BOX 		DB 470 DUP(13)	; Lets the player choose a feature to proceed
 YELLOW_BOX 		DB 470 DUP(14)	; Increases player's score by 15
 WHILE_BOX 		DB 470 DUP(15)
 
@@ -134,6 +134,12 @@ MAX_SCORE EQU 100
 ;       a                          1E
 ;       s                          1F
 ;       d                          20
+
+;    	r                          13 
+;     	y                          15 
+;    	g                          22 
+; 		b                          30
+                    
 
 
 ; Draws 8 X 8 Grid with 640 X 350 px of screen dimensions (VIDEO MODE AX = 0010H OR AX = 4F02H, BX = 0100) 
@@ -982,13 +988,14 @@ LOCAL TERMINATE, Calc_2, GetMax, GetMax2
 
 
 	cmp SCORE_P1, 85
-    JGE TERMINATE
+    JGE GETMAX
 
     ADD SCORE_P1, 15
 	JMP TERMINATE
 
     GetMax:
 	Mov Score_P1, 100
+	JMP TERMINATE
 
 CALC_2: 
 	cmp SCORE_P2, 85
@@ -1028,7 +1035,7 @@ LOCAL TERMINATE, Calc_2, Reset, Reset2
 	JL Reset
 
     SUB SCORE_P2, 20
-	JMP CALC_2
+	JMP TERMINATE
 Reset: 
     Mov Score_P2, 0
 	JMP TERMINATE
@@ -1042,6 +1049,129 @@ CALC_2:
 
 	Reset2: 
 	Mov Score_P1, 0
+TERMINATE: 
+ENDM
+
+PURPLE_BOX_EFFECT MACRO X, Y
+LOCAL TERMINATE, RED, YELLOW, GREEN
+LOCAL P2, CALC_2, CALC, RESET, RESET2
+LOCAL GETMAX, GETMAX2, REPEAT, PLAYER2
+    MOV CX, X
+	SUB CX, 26
+	MOV DX, Y
+	SUB DX, 22
+	MOV TEMP_X, CX
+	MOV TEMP_Y, DX
+
+	STORE_BOX TEMP_X, TEMP_Y
+    COMPARE_OBJS PURPLE_BOX, TEMP_BOX, BOX_PXS
+    JNE TERMINATE
+
+	MOV SI, X 
+    CMP SI, X_POS
+    JNE PLAYER2
+
+	MOV SI, Y
+	CMP SI, Y_POS
+	JNE PLAYER2
+
+	DRAW_PLAYER PLAYER_IMG, X_POS, Y_POS
+	JMP REPEAT
+
+	PLAYER2:
+	DRAW_PLAYER PLAYER_IMG2, X_POS2, Y_POS2
+
+REPEAT:
+
+	MOV AH, 0
+	INT 16H
+
+; Check the user input and repeat if it is invalid
+	CMP AH, 13H		; R
+	JE RED
+	CMP AH, 15H		; Y
+	JE YELLOW
+	CMP AH, 22H		; G
+	JE GREEN
+	
+	JMP REPEAT
+
+RED:
+	MOV SI, X 
+    CMP SI, X_POS
+    JNE P2
+
+	MOV SI, Y
+	CMP SI, Y_POS
+	JNE P2
+
+    MOV SCORE_P1, 0
+	JMP TERMINATE
+	
+	P2: 
+	MOV SCORE_P2, 0
+	JMP TERMINATE
+
+YELLOW:
+	MOV SI, X 
+    CMP SI, X_POS
+    JNE CALC_2
+
+	MOV SI, Y
+	CMP SI, Y_POS
+	JNE CALC_2
+
+	CMP SCORE_P1, 85
+    JGE GETMAX
+
+    ADD SCORE_P1, 15
+	JMP TERMINATE
+
+    GETMAX:
+	Mov Score_P1, 100
+	JMP TERMINATE
+
+	CALC_2: 
+	CMP SCORE_P2, 85
+    JGE GetMax2
+
+	ADD SCORE_P2, 15
+	JMP Terminate
+
+	GETMAX2: 
+	Mov Score_P2, 100
+	JMP TERMINATE
+		
+GREEN:
+	MOV SI, X 
+    CMP SI, X_POS
+    JNE CALC
+
+	MOV SI, Y
+	CMP SI, Y_POS
+	JNE CALC
+
+    CMP SCORE_P2, 20
+	JL Reset
+
+    SUB SCORE_P2, 20
+	JMP TERMINATE
+
+	RESET: 
+    Mov Score_P2, 0
+	JMP TERMINATE
+
+	CALC: 
+    CMP SCORE_P1, 20
+	JL Reset2
+
+	SUB SCORE_P1, 20
+    Jmp Terminate
+
+	RESET2: 
+	Mov Score_P1, 0
+	JMP TERMINATE
+
 TERMINATE: 
 ENDM
 
@@ -1123,13 +1253,13 @@ MAIN PROC FAR
 	DRAW_PLAYER PLAYER_IMG2, X_POS2, Y_POS2
 
 	Draw_Box 30, 15, 14
-	Draw_Box 110, 144, 10
-	Draw_Box 270, 144, 14
-	DRAW_Box 350, 58, 12
+	Draw_Box 110, 144, 13
+	Draw_Box 270, 144, 12
+	DRAW_Box 350, 58, 13
 	DRAW_Box 510, 187, 14
-	DRAW_Box 350, 230, 12
-	Draw_Box 590, 230, 10
-	DRAW_Box 590, 316, 14
+	DRAW_Box 350, 230, 13
+	Draw_Box 590, 230, 12
+	DRAW_Box 590, 316, 13
 
 	DRAW_COIN_IMG 127, 30
 	DRAW_COIN_IMG 287, 202
@@ -1186,12 +1316,10 @@ MAIN PROC FAR
 
 			; Increases the score if it is a coin
 				COIN_EFFECT X_POS, Y_POS
-				
-				
 				YELLOW_BOX_EFFECT X_POS, Y_POS
 				RED_BOX_EFFECT X_POS, Y_POS
-				
 				GREEN_BOX_EFFECT X_POS, Y_POS
+				PURPLE_BOX_EFFECT X_POS, Y_POS
 				
 
 				DRAW_PLAYER PLAYER_IMG, X_POS, Y_POS
@@ -1219,13 +1347,10 @@ SKIP1:
 				SUB X_POS, DX
 
 				COIN_EFFECT X_POS, Y_POS
-				
 				YELLOW_BOX_EFFECT X_POS, Y_POS
-				
 				RED_BOX_EFFECT X_POS, Y_POS
-				
 				GREEN_BOX_EFFECT X_POS, Y_POS
-				
+				PURPLE_BOX_EFFECT X_POS, Y_POS
 
 				DRAW_PLAYER PLAYER_IMG, X_POS, Y_POS
 			JMP INFINITE
@@ -1250,13 +1375,10 @@ SKIP2:
 				ADD X_POS, DX
 
 				COIN_EFFECT X_POS, Y_POS
-				
 				YELLOW_BOX_EFFECT X_POS, Y_POS
-				
 				RED_BOX_EFFECT X_POS, Y_POS
-				
 				GREEN_BOX_EFFECT X_POS, Y_POS
-				
+				PURPLE_BOX_EFFECT X_POS, Y_POS
 
 				DRAW_PLAYER PLAYER_IMG, X_POS, Y_POS
 			JMP INFINITE
@@ -1281,13 +1403,11 @@ SKIP3:
 				ADD Y_POS, DX
 
 				COIN_EFFECT X_POS, Y_POS
-				
 				YELLOW_BOX_EFFECT X_POS, Y_POS
-				
 				RED_BOX_EFFECT X_POS, Y_POS
-				
 				GREEN_BOX_EFFECT X_POS, Y_POS
-				
+				PURPLE_BOX_EFFECT X_POS, Y_POS
+
 
 				DRAW_PLAYER PLAYER_IMG, X_POS, Y_POS
 			JMP INFINITE
@@ -1317,13 +1437,11 @@ SKIP4:
 				SUB Y_POS2, DX
 
 				COIN_EFFECT X_POS2, Y_POS2
-				
 				YELLOW_BOX_EFFECT X_POS2, Y_POS2
-				
 				RED_BOX_EFFECT X_POS2, Y_POS2
-				
 				GREEN_BOX_EFFECT X_POS2, Y_POS2
-				
+				PURPLE_BOX_EFFECT X_POS2, Y_POS2
+
 
 				DRAW_PLAYER PLAYER_IMG2, X_POS2, Y_POS2
 			JMP INFINITE
@@ -1350,13 +1468,10 @@ SKIP5:
 				SUB X_POS2, DX
 
 				COIN_EFFECT X_POS2, Y_POS2
-				
 				YELLOW_BOX_EFFECT X_POS2, Y_POS2
-				
 				RED_BOX_EFFECT X_POS2, Y_POS2
-				
 				GREEN_BOX_EFFECT X_POS2, Y_POS2
-				
+				PURPLE_BOX_EFFECT X_POS2, Y_POS2
 
 				DRAW_PLAYER PLAYER_IMG2, X_POS2, Y_POS2
 			JMP INFINITE
@@ -1381,13 +1496,10 @@ SKIP6:
 				ADD X_POS2, DX
 
 				COIN_EFFECT X_POS2, Y_POS2
-				
 				YELLOW_BOX_EFFECT X_POS2, Y_POS2
-				
 				RED_BOX_EFFECT X_POS2, Y_POS2
-				
 				GREEN_BOX_EFFECT X_POS2, Y_POS2
-				
+				PURPLE_BOX_EFFECT X_POS2, Y_POS2
 
 				DRAW_PLAYER PLAYER_IMG2, X_POS2, Y_POS2
 			JMP INFINITE
@@ -1412,13 +1524,10 @@ SKIP7:
 				ADD Y_POS2, DX
 
 				COIN_EFFECT X_POS2, Y_POS2
-				
 				YELLOW_BOX_EFFECT X_POS2, Y_POS2
-				
 				RED_BOX_EFFECT X_POS2, Y_POS2
-				
 				GREEN_BOX_EFFECT X_POS2, Y_POS2
-				
+				PURPLE_BOX_EFFECT X_POS2, Y_POS2
 
 				DRAW_PLAYER PLAYER_IMG2, X_POS2, Y_POS2
 			JMP INFINITE

@@ -1,99 +1,55 @@
 .MODEL SMALL
 .STACK 64
 .DATA
-PXS DW 0
+strResult dW 8, ? ; string buffer to store results
+
 .CODE
-
-DRAW_FILLED_RECT MACRO X, Y, LEN, WID, COLOR
-LOCAL DRAW_WID, DRAW_LEN, FILL
-    MOV CX, X           ; X-Pos
-    MOV DX, Y           ; Y-Pos
-    MOV AH, 0CH       ; AH: Draw Pixel | AL: Color
-	MOV AL, COLOR
-
-    ; Draw the right and left sides
-    MOV BX, WID
-    ADD BX, DX
-    DRAW_WID:
-        INT 10H
-        INC PXS
-        MOV DI, CX
-        ADD DI, LEN
-        FILL:
-            INC CX
-            INT 10H
-            INC PXS
-            CMP CX, DI
-        JNE FILL
-        SUB CX, LEN
-        INC DX
-        CMP DX, BX
-    JNE DRAW_WID
-ENDM
-
-DRAW_FILLED_CUBOID MACRO X, Y, LEN, WID, HEIGHT, COLOR
-LOCAL DRAW, FILL_HEIGHT, FILL_LEN
-
-    MOV CX, X           ; X-Pos
-    MOV DX, Y           ; Y-Pos
-    MOV AH, 0CH       	; AH: Draw Pixel
-	MOV AL, COLOR
-
-; To draw the front side
-	MOV BL, COLOR
-	ADD BL, 8
-    DRAW_FILLED_RECT X, Y, LEN, HEIGHT, BL
-
-    ADD CX, LEN     ; Reset X-Pos and Y-Pos to the bottom right corner
-    INC CX
-    DEC DX
-
-; To calculate the stop pos of the cuboid edges 
-    MOV BX, DX
-    MOV SI, WID
-    SHR SI, 1
-    SUB BX, SI
-
-    MOV AL, COLOR             ; Color of Top and Left sides
-
-    DRAW:
-    INT 10H
-; To fill the right side of the cuboid
-        INC PXS
-        MOV DI, DX
-        SUB DI, HEIGHT
-        FILL_HEIGHT:
-            DEC DX
-            INT 10H
-            INC PXS
-            CMP DX, DI
-        JNE FILL_HEIGHT
-
-; To fill the top side of the cuboid
-        MOV DI, CX
-        SUB DI, LEN
-        FILL_LEN:
-            DEC CX
-            INT 10H
-            INC PXS
-            CMP CX, DI
-        JNE FILL_LEN
-    
-        ADD CX, LEN
-        ADD DX, HEIGHT
-        INC CX
-        DEC DX
-        CMP DX, BX
-    JNE DRAW
-ENDM
-
-MAIN PROC FAR
+MAIN Proc far
     MOV AX, @DATA
     MOV DS, AX
-    MOV AX, 0013H
+    MOV ES, AX
 
+    MOV AX, 4F02H
+    MOV BX, 0100H
+    INT 10h
+
+    mov ax, strResult  ; number to be converted
+    mov cx, 10         ; divisor
+    xor bx, bx          ; count digits
+
+divide:
+    xor dx, dx        ; high part = 0
+    div cx             ; ax = dx:ax/cx, dx = remainder
+    push dx             ; DL is a digit in range [0..9]
+    inc bx              ; count digits
+    test ax, ax       ; AX is 0?
+    jnz divide          ; no, continue
+
+    ; POP digits from stack in reverse order
+    mov cx, bx          ; number of digits
+    lea si, strResult+2   ; DS:SI points to string buffer
+next_digit:
+    pop ax
+    add al, '0'         ; convert to ASCII
+    mov [si], al        ; write it to the buffer
+    inc si
+    loop next_digit
+
+    ; MOV DX, OFFSET strResult
+    ; MOV AH, 9
+    ; INT 21H
+
+    MOV AH,13H 					;To print string in the graphical mode
+    MOV AL,0 					;To make all the characters be in the same color
+    MOV BH,0 					;Page number= zero (always)
+    MOV BL,0FH 					;Color of the text (white foreground and black background)
+    MOV CX,1					;Length of the string to be printed 
+    MOV DH,2 					;Y coordinate
+    MOV DL,2 					;X coordinate
+    MOV BP,OFFSET strResult+2 	;Moves to bp the offset of the string
     INT 10H
-    DRAW_FILLED_CUBOID 10, 10, 16, 12, 16, 2H
+
     MOV DX, 0
-MAIN ENDP
-END MAIN
+    ;HLT
+MAIN Endp
+End MAIN

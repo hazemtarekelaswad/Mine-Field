@@ -77,7 +77,7 @@ GREEN_BOX 		DB 470 DUP(10)	; Decreases other player's score by 20
 AQUA_BOX 		DB 470 DUP(11)	
 RED_BOX 		DB 470 DUP(12)	; Resets player's score
 PURPLE_BOX 		DB 470 DUP(13)	; Lets player choose a feature to proceed
-YELLOW_BOX 		DB 470 DUP(14)	; Increases player's score by 10
+YELLOW_BOX 		DB 470 DUP(14)	; Increases player's score by 15
 WHILE_BOX 		DB 470 DUP(15)
 
 
@@ -116,7 +116,7 @@ Y_RAND_COIN DW ?
 
 CONTAINS_FLAG	DB 0
 
-SCORE_MSG DB ':Score:', '$'
+SCORE_MSG DB ':Score:'
 ; Score, Number of digits, Score as a string
 SCORE_P1 DW 0, ?, ?
 SCORE_P2 DW 0, ?, ?
@@ -893,6 +893,7 @@ ENDP
 
 CONVERT_TO_ASCII MACRO SCORE
 LOCAL next_digit, divide
+	MOV SCORE+4, '0'
 	mov ax, SCORE       ; number to be converted
     mov cx, 10         	; divisor
     xor bx, bx          ; count digits
@@ -912,7 +913,7 @@ divide:
 next_digit:
     pop ax
     add al, '0'           ; convert to ASCII
-    mov [SI], al        ; write it to the buffer
+    mov [SI], AL        ; write it to the buffer
     inc si
     loop next_digit
 ENDM
@@ -1015,10 +1016,11 @@ LOCAL TERMINATE, Calc_2, Reset, Reset2
 	JL Reset
 
     SUB SCORE_P2, 20
+	JMP CALC_2
 Reset: 
     Mov Score_P2, 0
-
 	JMP TERMINATE
+
 CALC_2: 
     CMP SCORE_P1, 20
 	JL Reset2
@@ -1056,9 +1058,10 @@ TERMINATE:
 ENDM
 
 DISPLAY_SCORE_P1 PROC
+
 	CONVERT_TO_ASCII SCORE_P1
 	MOV AX, 1300H
-	Mov cx, SCORE_P1+2
+	Mov CX, 2
 	MOV BH,0 				; Page number = zero (always)
     MOV BL,0FH 				; White color
 	MOV DH,22 				; Y coordinate
@@ -1071,7 +1074,7 @@ ENDP
 DISPLAY_SCORE_P2 PROC
 	CONVERT_TO_ASCII SCORE_P2
 	MOV AX, 1300H
-	Mov cx, SCORE_P2+2
+	Mov cx, 2
 	MOV BH,0 				; Page number = zero (always)
     MOV BL,0FH 				; White color
 	MOV DH,22 				; Y coordinate
@@ -1130,8 +1133,8 @@ MAIN PROC FAR
 
 ; Infinite loop that lets the user move players all around the grid
 	INFINITE:
-	call DISPLAY_SCORE_P1
-	call DISPLAY_SCORE_P2
+		CALL DISPLAY_SCORE_P1
+		CALL DISPLAY_SCORE_P2
 	; Check if the a key is pressed
 		MOV AH, 1			
 		INT 16H				; Gets a key in the keyboard buffer

@@ -41,9 +41,9 @@ IMG_HEIGHT2 EQU 32
  DB 164, 165, 167, 20, 20, 20, 21, 20, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 19, 244, 244, 20, 164, 66, 14, 14, 14, 14, 14, 14, 14, 67, 66, 24, 21, 21 
  DB 21, 20, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 245, 244, 20, 25, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 67, 26, 21, 21, 21, 16, 16, 16, 16, 16 
  DB 16, 16, 16, 16, 245, 245, 244, 26, 14, 14, 14, 14, 14, 14, 14, 24, 24, 67, 14, 14, 14, 14, 14, 14, 27, 21, 21, 21, 16, 16, 16, 16, 16, 16, 16, 244, 245, 20, 20, 244 
- DB 25, 14, 14, 14, 14, 67, 21, 21, 21, 21, 67, 14, 14, 14, 14, 26, 21, 160, 21, 21, 21, 16, 16, 16, 16, 16, 16, 245, 20, 12, 12, 135, 20, 14, 14, 14, 14, 26, 20, 12 
- DB 12, 21, 25, 14, 14, 14, 67, 21, 160, 12, 12, 21, 21, 16, 16, 16, 16, 16, 243, 245, 136, 12, 12, 12, 244, 66, 14, 14, 14, 164, 135, 12, 12, 160, 164, 14, 14, 14, 66, 21 
- DB 12, 12, 12, 160, 21, 21, 16, 16, 16, 16, 245, 245, 136, 12, 12, 12, 244, 14, 14, 14, 26, 21, 20, 135, 137, 21, 167, 26, 67, 14, 67, 21, 12, 12, 12, 12, 21, 21, 16, 16 
+ DB 25, 14, 14, 14, 14, 67, 21, 21, 21, 21, 67, 14, 14, 14, 14, 26, 21, 160, 21, 21, 21, 16, 16, 16, 16, 16, 16, 245, 20, 4, 4, 135, 20, 14, 14, 14, 14, 26, 20, 4 
+ DB 12, 21, 25, 14, 14, 14, 67, 21, 160, 4, 4, 21, 21, 16, 16, 16, 16, 16, 243, 245, 136, 4, 4, 4, 244, 66, 14, 14, 14, 164, 135, 4, 4, 160, 164, 14, 14, 14, 66, 21 
+ DB 12, 4, 4, 160, 21, 21, 16, 16, 16, 16, 245, 245, 136, 4, 4, 4, 244, 14, 14, 14, 26, 21, 20, 135, 137, 21, 167, 26, 67, 14, 67, 21, 4, 4, 4, 4, 21, 21, 16, 16 
  DB 16, 16, 245, 245, 20, 160, 160, 20, 164, 14, 14, 164, 20, 164, 165, 20, 20, 164, 164, 21, 25, 14, 14, 164, 21, 22, 22, 21, 21, 21, 16, 16, 16, 16, 245, 245, 165, 20, 20, 164 
  DB 14, 14, 14, 67, 67, 14, 14, 25, 25, 14, 14, 67, 67, 14, 14, 67, 24, 22, 21, 23, 21, 21, 16, 16, 16, 16, 21, 244, 164, 14, 14, 14, 14, 14, 14, 14, 14, 14, 66, 20 
  DB 20, 66, 14, 14, 14, 14, 14, 14, 68, 68, 68, 24, 21, 21, 16, 16, 16, 16, 16, 244, 20, 14, 14, 14, 67, 164, 24, 67, 14, 14, 14, 66, 66, 14, 14, 14, 67, 25, 25, 67 
@@ -76,11 +76,14 @@ DB 66, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 66, 66, 66, 0, 66, 66, 66, 14, 14
 DB 0, 44, 66, 66, 66, 66, 14, 14, 14, 14, 66, 66, 66, 66, 44, 0, 0, 0, 44, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 44
 DB 0, 0, 0, 0, 0, 0, 66, 66, 66, 66, 66, 66, 66, 66, 0, 0, 0, 0
 
+MAX_GRID_WID 		EQU	640
+MAX_GRID_HEIGHT		EQU 344
+
 BLACKBOX 		DB 1024 DUP(0)
 
 BOX_PXS			EQU 470
 
-BLUE_BOX 		DB 470 DUP(9)	
+BLUE_BOX 		DB 470 DUP(9)	; Clears all red boxes from the whole grid
 GREEN_BOX 		DB 470 DUP(10)	; Decreases other player's score by 20
 AQUA_BOX 		DB 470 DUP(11)	
 RED_BOX 		DB 470 DUP(12)	; Resets player's score
@@ -89,12 +92,12 @@ YELLOW_BOX 		DB 470 DUP(14)	; Increases player's score by 15
 WHILE_BOX 		DB 470 DUP(15)
 
 
-TEMP_WID_16		DW 16
-TEMP_HEIGHT_16	DW 16
+TEMP_WID_16		EQU 16
+TEMP_HEIGHT_16	EQU 16
 TEMP_IMG_16		DB 256 DUP(?)
 
-TEMP_WID_32		DW 32
-TEMP_HEIGHT_32	DW 32
+TEMP_WID_32		EQU 32
+TEMP_HEIGHT_32	EQU 32
 TEMP_IMG_32		DB 1024 DUP(?)
 
 TEMP_BOX		DB 470 DUP(?)
@@ -131,6 +134,9 @@ MAX_SCORE 	EQU 100
 
 STATUS_PURPLE 		DB 'Choose a Box (Y / G / B)'
 STATUS_PURPLE_LEN	EQU	24
+
+WIN_MSG1		DB 'PLAYER 1 WINS'
+WIN_MSG2        DB 'PLAYER 2 WINS'
 
 CONTAINS_FLAG	DB 0
 
@@ -593,97 +599,12 @@ DRAW_PLAYER MACRO PLAYER_IMG, X, Y
 	DRAW_IMAGE PLAYER_IMG, X, Y, IMG_WID, IMG_HEIGHT
 ENDM
 
-CLEAR_SCREEN PROC
-    MOV AX, 0013H
-    INT 10H
-    RET
-CLEAR_SCREEN ENDP
-
 CHANGE_TO_VIDEO PROC 
 	; Change to video mode 640 X 400 X 256
 	MOV AX, 4F02H
     MOV BX, 0100H
     int 10h        
 	; MOV AH,0Bh 
-	RET
-ENDP
-
-RANDGEN PROC
-   ; A procedure which produce a random value in dx 
-   MOV AH, 00h  ; interrupts to get system time        
-   INT 1AH      ; CX:DX now hold number of clock ticks since midnight      
-
-   mov  ax, dx
-   xor  dx, dx
-   mov  cx, 10    
-   div  cx       ; here dx contains the remainder of the division - from 0 to 9
-   
-   ;add  dl, '0'  ; to ascii from '0' to '9'
-   ;mov ah, 2h   ; call interrupt to display a value in DL
-   ;int 21h    
-	RET
-ENDP
-    
-DRAW_RAND_BOX MACRO Colour 
-   Local ReGenRand1, ReGenRand2 
-   ReGenRand1:
-
-    call RandGen
-	Mov Ax, 80
-	inc dl
-	Mul dl
-    Sub Ax, 50
-
-    cmp Ax, 640
-	JNC ReGenRand1
-
-    Mov X_RAND_Box, Ax
-
-    ReGenRand2:
-
-    call RandGen
-	Mov Ax, 43
-	dec dl 
-    Mul dl
-	sub Ax, 28
-
-	cmp Ax, 350
-	JNC ReGenRand2
-
-	Mov Y_RAND_Box, AX
-
-	DRAW_BOX X_RAND_Box, Y_RAND_Box , Colour
-ENDM
-
-DRAW_RAND_COIN PROC
-	ReGenRandCoin1:
-
-    call RandGen
-	Mov Ax, 80
-	inc dl
-	Mul dl
-    Add Ax, 47
-
-    cmp Ax, 640
-	JNC ReGenRandCoin1
-
-    Mov X_RAND_COin, Ax
-
-    ReGenRandCoin2:
-
-    call RandGen
-	Mov Ax, 43 
-	sub dl, 2
-    Mul dl
-	Add Ax, 30
-
-	cmp Ax, 350
-	JNC ReGenRandCoin2
-
-	Mov Y_RAND_Coin, AX
-
-	DRAW_COIN X_RAND_COin, Y_RAND_Coin
-
 	RET
 ENDP
 
@@ -890,6 +811,94 @@ STORE_IMG_RELATIVE PROC
 	RET
 ENDP
 
+RANDGEN PROC
+   ; A procedure which produce a random value in dx 
+   MOV AH, 00h  ; interrupts to get system time        
+   INT 1AH      ; CX:DX now hold number of clock ticks since midnight      
+
+   mov  ax, dx
+   xor  dx, dx
+   mov  cx, 10    
+   div  cx       ; here dx contains the remainder of the division - from 0 to 9
+   
+   ;add  dl, '0'  ; to ascii from '0' to '9'
+   ;mov ah, 2h   ; call interrupt to display a value in DL
+   ;int 21h    
+	RET
+ENDP
+    
+DRAW_RAND_BOX MACRO Colour 
+   Local ReGenRand1, ReGenRand2 , TERMINATE
+   ReGenRand1:
+
+    call RandGen
+	Mov Ax, 80
+	inc dl
+	Mul dl
+    Sub Ax, 50
+
+    cmp Ax, 640
+	JNC ReGenRand1
+
+    Mov X_RAND_Box, Ax
+
+    ReGenRand2:
+
+    call RandGen
+	Mov Ax, 43
+	dec dl 
+    Mul dl
+	sub Ax, 28
+
+	cmp Ax, 350
+	JNC ReGenRand2
+
+	Mov Y_RAND_Box, AX
+
+	STORE_BOX  X_RAND_BOX, Y_RAND_Box
+	COMPARE_OBJS TEMP_BOX, BLACKBOX, BOX_PXS
+	JNE TERMINATE
+
+	DRAW_BOX X_RAND_Box, Y_RAND_Box , Colour
+TERMINATE:
+ENDM
+
+DRAW_RAND_COIN PROC
+	ReGenRandCoin1:
+
+    call RandGen
+	Mov Ax, 80
+	inc dl
+	Mul dl
+    Add Ax, 47
+
+    cmp Ax, 640
+	JNC ReGenRandCoin1
+
+    Mov X_RAND_COin, Ax
+
+    ReGenRandCoin2:
+
+    call RandGen
+	Mov Ax, 43 
+	sub dl, 2
+    Mul dl
+	Add Ax, 30
+
+	cmp Ax, 350
+	JNC ReGenRandCoin2
+
+	Mov Y_RAND_Coin, AX
+
+	STORE_IMG_16 X_RAND_COIN, Y_RAND_COIN
+	COMPARE_OBJS TEMP_IMG_16, BLACKBOX, 256
+	JNE TERMINATE
+
+	DRAW_COIN X_RAND_COin, Y_RAND_Coin
+TERMINATE:
+	RET
+ENDP
+
 CONVERT_TO_ASCII MACRO SCORE
 LOCAL next_digit, divide
 	MOV SCORE+4, '0'
@@ -1011,7 +1020,6 @@ CALC_2:
 
 	GetMax2: 
 	Mov Score_P2, 100
-
 TERMINATE: 
 ENDM
 
@@ -1057,6 +1065,50 @@ CALC_2:
 TERMINATE: 
 ENDM
 
+CLEAR_RED_BOXES PROC
+	MOV CX, 0
+	MOV SI, MAX_GRID_WID
+	MOV DX, 0
+	MOV DI, MAX_GRID_HEIGHT
+REPEAT_Y:
+	REPEAT_X:
+		MOV AH, 0DH
+		INT 10H
+		CMP AL, 12	; RED
+		JNE CONTINUE
+
+		MOV AH, 0CH
+		MOV AL, 0	;BLACK
+		INT 10H
+
+		CONTINUE:
+		INC CX 
+		CMP CX, SI
+	JNE REPEAT_X
+	
+	SUB CX, MAX_GRID_WID
+	INC DX
+	CMP DX, DI
+JNE REPEAT_Y
+	RET
+ENDP
+
+BLUE_BOX_EFFECT MACRO X, Y
+LOCAL TERMINATE
+	MOV CX, X
+	SUB CX, 26
+	MOV DX, Y
+	SUB DX, 22
+	MOV TEMP_X, CX
+	MOV TEMP_Y, DX
+
+	STORE_BOX TEMP_X, TEMP_Y
+    COMPARE_OBJS BLUE_BOX, TEMP_BOX, BOX_PXS
+    JNE TERMINATE
+	CALL CLEAR_RED_BOXES
+TERMINATE:
+ENDM
+
 PURPLE_BOX_EFFECT MACRO X, Y
 LOCAL TERMINATE, BLUE, YELLOW, GREEN
 LOCAL P2, CALC_2, CALC, RESET, RESET2
@@ -1072,7 +1124,7 @@ LOCAL GETMAX, GETMAX2, REPEAT, PLAYER2
     COMPARE_OBJS PURPLE_BOX, TEMP_BOX, BOX_PXS
     JNE TERMINATE
 
-	DISPLAY_STATUS 25, 23, STATUS_PURPLE_LEN, STATUS_PURPLE
+	DISPLAY_STATUS 27, 23, STATUS_PURPLE_LEN, STATUS_PURPLE
 
 	MOV SI, X 
     CMP SI, X_POS
@@ -1106,20 +1158,7 @@ REPEAT:
 
 ; requires modifications after adding its feature
 BLUE:
-	MOV SI, X 
-    CMP SI, X_POS
-    JNE P2
-
-	MOV SI, Y
-	CMP SI, Y_POS
-	JNE P2
-
-    MOV SCORE_P1, 0
-	JMP TERMINATE
-	
-	P2: 
-	MOV SCORE_P2, 0
-	JMP TERMINATE
+	CALL CLEAR_RED_BOXES
 
 YELLOW:
 	MOV SI, X 
@@ -1182,11 +1221,11 @@ GREEN:
 	JMP TERMINATE
 
 TERMINATE:
-	CLEAR_STATUS 25, 23, STATUS_PURPLE_LEN, STATUS_PURPLE 
+	CLEAR_STATUS 27, 23, STATUS_PURPLE_LEN, STATUS_PURPLE 
 ENDM
 
 COIN_EFFECT MACRO X, Y    
-LOCAL TERMINATE, Calc_2
+LOCAL TERMINATE, Calc_2, Win1, Win2
     MOV CX, X
 	SUB CX, 9
 	MOV DX, Y
@@ -1206,10 +1245,24 @@ LOCAL TERMINATE, Calc_2
 	CMP SI, Y_POS
 	JNE CALC_2
 
-    INC SCORE_P1
+    cmp Score_P1, 99
+	JGE Win1
+    INC SCORE_P1 
+	Jmp Terminate
+Win1: 
+    Mov Score_P1, 100 
 	JMP TERMINATE
+
 CALC_2: 
+
+    cmp Score_P2, 99
+	JGE Win2
+
 	INC SCORE_P2
+	Jmp Terminate
+Win2: 
+    Mov Score_P2,100
+
 TERMINATE: 
 ENDM
 
@@ -1260,41 +1313,44 @@ MAIN PROC FAR
 
 	CALL DISPLAY_WORD_SCORE
 
-	CALL DISPLAY_SCORE_P1
-	CALL DISPLAY_SCORE_P2
-
 	DRAW_PLAYER PLAYER_IMG, X_POS, Y_POS
 	DRAW_PLAYER PLAYER_IMG2, X_POS2, Y_POS2
 
 	DRAW_BOX 30, 15, 14
-	DRAW_BOX 110, 144, 13
-	DRAW_BOX 270, 144, 12
+	DRAW_BOX 110, 144, 12
+	DRAW_BOX 270, 144, 9
 	DRAW_BOX 350, 58, 13
-	DRAW_BOX 510, 187, 14
-	DRAW_BOX 350, 230, 13
+	DRAW_BOX 510, 187, 10
+	DRAW_BOX 350, 230, 10
 	DRAW_BOX 590, 230, 12
-	DRAW_BOX 590, 316, 13
+	DRAW_BOX 590, 316, 14
 
 	DRAW_COIN 127, 30
 	DRAW_COIN 287, 202
 	DRAW_COIN 207, 116
 	DRAW_COIN 367, 30
-	DRAW_COIN 607, 288 ;x = 447
+	DRAW_COIN 447, 288 
 	DRAW_COIN 127, 202
 	DRAW_COIN 207, 288
 	DRAW_COIN 527, 116
 	DRAW_COIN 367, 30
 	DRAW_COIN 447, 73
-	DRAW_COIN 127, 116
+	DRAW_COIN 127, 116	
+	DRAW_COIN 207, 202
+	DRAW_COIN 287, 288
 
-	CALL Draw_RAND_Coin
-
-	Draw_Rand_Box 15 
 
 ; Infinite loop that lets the user move players all around the grid
 	INFINITE:
 		CALL DISPLAY_SCORE_P1
 		CALL DISPLAY_SCORE_P2
+
+	; Check one of the players reaches score 100 to end the game
+		CMP SCORE_P1, 100
+		JGE END_GAME
+		CMP SCORE_P2, 100
+		JGE END_GAME
+
 	; Check if the a key is pressed
 		MOV AH, 1			
 		INT 16H				; Gets a key in the keyboard buffer
@@ -1328,17 +1384,21 @@ MAIN PROC FAR
 				MOV DX, STEPY
 				SUB Y_POS, DX
 
-			; Increases the score if it is a coin
+			; Features
 				COIN_EFFECT X_POS, Y_POS
-				YELLOW_BOX_EFFECT X_POS, Y_POS
 				RED_BOX_EFFECT X_POS, Y_POS
+				YELLOW_BOX_EFFECT X_POS, Y_POS
 				GREEN_BOX_EFFECT X_POS, Y_POS
 				PURPLE_BOX_EFFECT X_POS, Y_POS
+				BLUE_BOX_EFFECT X_POS, Y_POS
 				
-
 				DRAW_PLAYER PLAYER_IMG, X_POS, Y_POS
+
+				DRAW_RAND_BOX 10
+				CALL DRAW_RAND_COIN
 			JMP INFINITE
 SKIP1:
+
 			LEFT_ARROW:
 				CMP AH, 4BH
 				JNE SKIP2
@@ -1361,12 +1421,16 @@ SKIP1:
 				SUB X_POS, DX
 
 				COIN_EFFECT X_POS, Y_POS
-				YELLOW_BOX_EFFECT X_POS, Y_POS
 				RED_BOX_EFFECT X_POS, Y_POS
+				YELLOW_BOX_EFFECT X_POS, Y_POS
 				GREEN_BOX_EFFECT X_POS, Y_POS
 				PURPLE_BOX_EFFECT X_POS, Y_POS
+				BLUE_BOX_EFFECT X_POS, Y_POS
 
 				DRAW_PLAYER PLAYER_IMG, X_POS, Y_POS
+
+				DRAW_RAND_BOX 12
+				CALL DRAW_RAND_COIN
 			JMP INFINITE
 SKIP2:
 			RIGHT_ARROW:
@@ -1389,12 +1453,16 @@ SKIP2:
 				ADD X_POS, DX
 
 				COIN_EFFECT X_POS, Y_POS
-				YELLOW_BOX_EFFECT X_POS, Y_POS
 				RED_BOX_EFFECT X_POS, Y_POS
+				YELLOW_BOX_EFFECT X_POS, Y_POS
 				GREEN_BOX_EFFECT X_POS, Y_POS
 				PURPLE_BOX_EFFECT X_POS, Y_POS
+				BLUE_BOX_EFFECT X_POS, Y_POS
 
 				DRAW_PLAYER PLAYER_IMG, X_POS, Y_POS
+
+				DRAW_RAND_BOX 13
+			
 			JMP INFINITE
 SKIP3:
 			DOWN_ARROW:
@@ -1417,13 +1485,16 @@ SKIP3:
 				ADD Y_POS, DX
 
 				COIN_EFFECT X_POS, Y_POS
-				YELLOW_BOX_EFFECT X_POS, Y_POS
 				RED_BOX_EFFECT X_POS, Y_POS
+				YELLOW_BOX_EFFECT X_POS, Y_POS
 				GREEN_BOX_EFFECT X_POS, Y_POS
 				PURPLE_BOX_EFFECT X_POS, Y_POS
-
+				BLUE_BOX_EFFECT X_POS, Y_POS
 
 				DRAW_PLAYER PLAYER_IMG, X_POS, Y_POS
+
+				DRAW_RAND_BOX 14
+				CALL DRAW_RAND_COIN
 			JMP INFINITE
 SKIP4:
 
@@ -1451,13 +1522,15 @@ SKIP4:
 				SUB Y_POS2, DX
 
 				COIN_EFFECT X_POS2, Y_POS2
-				YELLOW_BOX_EFFECT X_POS2, Y_POS2
 				RED_BOX_EFFECT X_POS2, Y_POS2
+				YELLOW_BOX_EFFECT X_POS2, Y_POS2
 				GREEN_BOX_EFFECT X_POS2, Y_POS2
 				PURPLE_BOX_EFFECT X_POS2, Y_POS2
-
+				BLUE_BOX_EFFECT X_POS2, Y_POS2
 
 				DRAW_PLAYER PLAYER_IMG2, X_POS2, Y_POS2
+
+				DRAW_RAND_BOX 14
 			JMP INFINITE
 SKIP5:
 			A_KEY:
@@ -1482,12 +1555,15 @@ SKIP5:
 				SUB X_POS2, DX
 
 				COIN_EFFECT X_POS2, Y_POS2
-				YELLOW_BOX_EFFECT X_POS2, Y_POS2
 				RED_BOX_EFFECT X_POS2, Y_POS2
+				YELLOW_BOX_EFFECT X_POS2, Y_POS2
 				GREEN_BOX_EFFECT X_POS2, Y_POS2
 				PURPLE_BOX_EFFECT X_POS2, Y_POS2
+				BLUE_BOX_EFFECT X_POS2, Y_POS2
 
 				DRAW_PLAYER PLAYER_IMG2, X_POS2, Y_POS2
+
+				CALL DRAW_RAND_COIN
 			JMP INFINITE
 SKIP6:
 			D_KEY:
@@ -1510,12 +1586,16 @@ SKIP6:
 				ADD X_POS2, DX
 
 				COIN_EFFECT X_POS2, Y_POS2
-				YELLOW_BOX_EFFECT X_POS2, Y_POS2
 				RED_BOX_EFFECT X_POS2, Y_POS2
+				YELLOW_BOX_EFFECT X_POS2, Y_POS2
 				GREEN_BOX_EFFECT X_POS2, Y_POS2
 				PURPLE_BOX_EFFECT X_POS2, Y_POS2
+				BLUE_BOX_EFFECT X_POS2, Y_POS2
 
 				DRAW_PLAYER PLAYER_IMG2, X_POS2, Y_POS2
+
+				DRAW_RAND_BOX 12
+				CALL DRAW_RAND_COIN
 			JMP INFINITE
 SKIP7:
 			S_KEY:
@@ -1538,16 +1618,46 @@ SKIP7:
 				ADD Y_POS2, DX
 
 				COIN_EFFECT X_POS2, Y_POS2
-				YELLOW_BOX_EFFECT X_POS2, Y_POS2
 				RED_BOX_EFFECT X_POS2, Y_POS2
+				YELLOW_BOX_EFFECT X_POS2, Y_POS2
 				GREEN_BOX_EFFECT X_POS2, Y_POS2
 				PURPLE_BOX_EFFECT X_POS2, Y_POS2
+				BLUE_BOX_EFFECT X_POS2, Y_POS2
 
 				DRAW_PLAYER PLAYER_IMG2, X_POS2, Y_POS2
+
+				DRAW_RAND_BOX 10
 			JMP INFINITE
 SKIP8:
 	
 	JMP INFINITE
+
+END_GAME:
+
+; Display the winner
+CALL CHANGE_TO_VIDEO
+DISPLAY_STATUS 35, 12, 7, SCORE_MSG
+
+CONVERT_TO_ASCII SCORE_P1
+CONVERT_TO_ASCII SCORE_P2
+
+MOV AX, SCORE_P1
+CMP AX, SCORE_P2
+JG PLAYER1
+
+DISPLAY_STATUS 46, 12, 2, SCORE_P1+4
+DISPLAY_STATUS 30, 12, 3, SCORE_P2+4
+DISPLAY_STATUS 32, 10, 13, WIN_MSG2
+JMP END_PROGRAM
+
+Player1:
+DISPLAY_STATUS 46, 12, 3, SCORE_P1+4
+DISPLAY_STATUS 30, 12, 2, SCORE_P2+4
+DISPLAY_STATUS 32, 10, 13, WIN_MSG1
+
+
+END_PROGRAM:
+
 MAIN ENDP
 END MAIN
 

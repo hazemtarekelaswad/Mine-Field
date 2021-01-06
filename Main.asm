@@ -66,7 +66,15 @@ IMG_HEIGHT2 EQU 32
 ;dollar.bmp data
 IMG_WID3 EQU 16
 IMG_HEIGHT3 EQU 16
-DOLLAR DB 0, 0, 0, 0, 66, 66, 66, 66, 66, 66, 66, 66, 0, 0, 0, 0, 0, 0, 44, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 44, 0, 0, 0, 44, 66, 66, 66, 66, 14, 14, 14, 14, 66, 66, 66, 66, 44, 0, 0, 66, 66, 66, 14, 14, 14, 14, 14, 14, 14, 14, 66, 66, 66, 0, 66, 66, 66, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 66, 66, 66, 66, 66, 66, 14, 14, 14, 14, 66, 66, 14, 14, 14, 14, 66, 66, 66, 66, 66, 14, 14, 14, 14, 66, 14, 14, 66, 14, 14, 14, 14, 66, 66, 66, 66, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 66, 66, 66, 66, 14, 14, 14, 14, 14, 14, 66, 14, 14, 14, 14, 14, 66, 66, 66, 66, 14, 14, 14, 14, 14, 14, 14, 66, 14, 14, 14, 14, 66, 66, 66, 66, 66, 14, 14, 14, 14, 66, 66, 14, 14, 14, 14, 66, 66, 66, 66, 66, 66, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 66, 66, 66, 0, 66, 66, 66, 14, 14, 14, 14, 14, 14, 14, 14, 66, 66, 66, 0, 0, 44, 66, 66, 66, 66, 14, 14, 14, 14, 66, 66, 66, 66, 44, 0, 0, 0, 44, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 44, 0, 0, 0, 0, 0, 0, 66, 66, 66, 66, 66, 66, 66, 66, 0, 0, 0, 0
+DOLLAR DB 0, 0, 0, 0, 66, 66, 66, 66, 66, 66, 66, 66, 0, 0, 0, 0, 0, 0, 44, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 44
+DB 0, 0, 0, 44, 66, 66, 66, 66, 14, 14, 14, 14, 66, 66, 66, 66, 44, 0, 0, 66, 66, 66, 14, 14, 14, 14, 14, 14, 14, 14, 66
+DB 66, 66, 0, 66, 66, 66, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 66, 66, 66, 66, 66, 66, 14, 14, 14, 14, 66, 66, 14, 14
+DB 14, 14, 66, 66, 66, 66, 66, 14, 14, 14, 14, 66, 14, 14, 66, 14, 14, 14, 14, 66, 66, 66, 66, 14, 14, 14, 14, 14, 14
+DB 14, 14, 14, 14, 14, 14, 66, 66, 66, 66, 14, 14, 14, 14, 14, 14, 66, 14, 14, 14, 14, 14, 66, 66, 66, 66, 14, 14, 14
+DB 14, 14, 14, 14, 66, 14, 14, 14, 14, 66, 66, 66, 66, 66, 14, 14, 14, 14, 66, 66, 14, 14, 14, 14, 66, 66, 66, 66, 66
+DB 66, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 66, 66, 66, 0, 66, 66, 66, 14, 14, 14, 14, 14, 14, 14, 14, 66, 66, 66, 0
+DB 0, 44, 66, 66, 66, 66, 14, 14, 14, 14, 66, 66, 66, 66, 44, 0, 0, 0, 44, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 44
+DB 0, 0, 0, 0, 0, 0, 66, 66, 66, 66, 66, 66, 66, 66, 0, 0, 0, 0
 
 BLACKBOX 		DB 1024 DUP(0)
 
@@ -96,31 +104,35 @@ TEMP_X DW ?
 TEMP_Y DW ?
 
 ; First Player's image, initial position and speed
-PLAYER_IMG EQU MEO		; The name is defined above
-X_POS 	DW 616			; X and Y posistion of the player's right bottom corner
-Y_POS 	DW 37
-STEPX  	DW 80			; Step in horizontal direction
-STEPY  	DW 43			; Step in vertical direction
+PLAYER_IMG 	EQU MEO			; The name is defined above
+X_POS 		DW 616			; X and Y posistion of the player's right bottom corner
+Y_POS 		DW 37
+STEPX  		DW 80			; Step in horizontal direction
+STEPY  		DW 43			; Step in vertical direction
 
 ; Second Player's image, initial position and speed
 PLAYER_IMG2 EQU PIKA
-X_POS2 	DW 56
-Y_POS2 	DW 338
-STEPX2  DW 80
-STEPY2  DW 43
+X_POS2 		DW 56
+Y_POS2 		DW 338
+STEPX2  	DW 80
+STEPY2  	DW 43
 
 X_RAND_BOX	DW ?
 Y_RAND_BOX  DW ?
 X_RAND_COIN DW ?
 Y_RAND_COIN DW ?
 
-CONTAINS_FLAG	DB 0
 
-SCORE_MSG DB ':Score:'
+SCORE_MSG 	DB ':Score:'
 ; Score, Number of digits, Score as a string
-SCORE_P1 DW 0, ?, ?
-SCORE_P2 DW 0, ?, ?
-MAX_SCORE EQU 100
+SCORE_P1 	DW 0, ?, ?
+SCORE_P2 	DW 0, ?, ?
+MAX_SCORE 	EQU 100
+
+STATUS_PURPLE 		DB 'Choose a Box (Y / G / B)'
+STATUS_PURPLE_LEN	EQU	24
+
+CONTAINS_FLAG	DB 0
 
 .CODE
 
@@ -565,34 +577,15 @@ LOCAL DRAW, FILL_HEIGHT, FILL_LEN
     JNE DRAW
 ENDM
 
+; initial X = 30
+; initial Y = 15
 DRAW_BOX MACRO X, Y, colour
 	DRAW_FILLED_CUBOID X, Y, 16, 12, 16, colour
 ENDM
 
-; X of coins 5, 15, 25, 35, 45, 55, 65, 75
-; Y of coins 1, 4, 6, 9, 12, 14, 17, 20
-; 10h, 4F02H ==> 79 X 24
+; initial X = 47
+; initial Y = 30
 DRAW_COIN MACRO X, Y
-    XOR BX, BX
-    int 10h
-
-; Move the cursor to x, y positions
-    mov cx, 1        ; number of drawings
-    mov dl, X        ; x coordinate
-    mov dh, Y        ; y coordinate
-    mov ah, 2
-    int 10h
-
-; Display character in video mode
-    mov al,'O'
-    mov ah, 09h
-    mov bl, 0Eh      ; Color
-    int 10h
-endm 
-
-; initial X of coins 47
-; initial Y of coins 30
-DRAW_COIN_IMG MACRO X, Y
 	DRAW_IMAGE DOLLAR, X, Y, IMG_WID3, IMG_HEIGHT3
 ENDM
 
@@ -689,7 +682,7 @@ DRAW_RAND_COIN PROC
 
 	Mov Y_RAND_Coin, AX
 
-	DRAW_COIN_IMG X_RAND_COin, Y_RAND_Coin
+	DRAW_COIN X_RAND_COin, Y_RAND_Coin
 
 	RET
 ENDP
@@ -924,16 +917,28 @@ next_digit:
     loop next_digit
 ENDM
 
-DISPLAY_WORD_SCORE PROC 
-    MOV AH,13H 					;To print string in the graphical mode
-    MOV AL,0 					;To make all the characters be in the same color
-    MOV BH,0 					;Page number= zero (always)
-    MOV BL,0FH 					;Color of the text (white foreground and black background)
-    MOV CX,7 					;Length of the string to be printed 
-    MOV DH,22 					;Y coordinate
-    MOV DL,35 					;X coordinate
-    MOV BP,OFFSET SCORE_MSG 	;Moves to bp the offset of the string
+DISPLAY_STATUS MACRO X, Y, LEN, MSG
+	MOV AX,1300H 					;To print string in the graphical mode
+    MOV BX,000FH 					;BL: Color of the text (white foreground and black background), BH: Page number = zero (always)
+    MOV CX,LEN 						;Length of the string to be printed 
+    MOV DH,Y 						;Y coordinate
+    MOV DL,X 						;X coordinate
+    MOV BP,OFFSET MSG 		;Moves to bp the offset of the string
     INT 10H
+ENDM 
+
+CLEAR_STATUS MACRO X, Y, LEN, MSG
+	MOV AX,1300H 					;To print string in the graphical mode
+    MOV BX,0000H 					;BL: Color of the text (white foreground and black background), BH: Page number = zero (always)
+    MOV CX,LEN 						;Length of the string to be printed 
+    MOV DH,Y 						;Y coordinate
+    MOV DL,X 						;X coordinate
+    MOV BP,OFFSET MSG 		;Moves to bp the offset of the string
+    INT 10H
+ENDM 
+
+DISPLAY_WORD_SCORE PROC 
+    DISPLAY_STATUS 35, 22, 7, SCORE_MSG
     RET
  ENDP 
 
@@ -1053,7 +1058,7 @@ TERMINATE:
 ENDM
 
 PURPLE_BOX_EFFECT MACRO X, Y
-LOCAL TERMINATE, RED, YELLOW, GREEN
+LOCAL TERMINATE, BLUE, YELLOW, GREEN
 LOCAL P2, CALC_2, CALC, RESET, RESET2
 LOCAL GETMAX, GETMAX2, REPEAT, PLAYER2
     MOV CX, X
@@ -1067,6 +1072,8 @@ LOCAL GETMAX, GETMAX2, REPEAT, PLAYER2
     COMPARE_OBJS PURPLE_BOX, TEMP_BOX, BOX_PXS
     JNE TERMINATE
 
+	DISPLAY_STATUS 25, 23, STATUS_PURPLE_LEN, STATUS_PURPLE
+
 	MOV SI, X 
     CMP SI, X_POS
     JNE PLAYER2
@@ -1076,6 +1083,7 @@ LOCAL GETMAX, GETMAX2, REPEAT, PLAYER2
 	JNE PLAYER2
 
 	DRAW_PLAYER PLAYER_IMG, X_POS, Y_POS
+
 	JMP REPEAT
 
 	PLAYER2:
@@ -1087,8 +1095,8 @@ REPEAT:
 	INT 16H
 
 ; Check the user input and repeat if it is invalid
-	CMP AH, 13H		; R
-	JE RED
+	CMP AH, 30H		; B
+	JE BLUE
 	CMP AH, 15H		; Y
 	JE YELLOW
 	CMP AH, 22H		; G
@@ -1096,7 +1104,8 @@ REPEAT:
 	
 	JMP REPEAT
 
-RED:
+; requires modifications after adding its feature
+BLUE:
 	MOV SI, X 
     CMP SI, X_POS
     JNE P2
@@ -1172,7 +1181,8 @@ GREEN:
 	Mov Score_P1, 0
 	JMP TERMINATE
 
-TERMINATE: 
+TERMINATE:
+	CLEAR_STATUS 25, 23, STATUS_PURPLE_LEN, STATUS_PURPLE 
 ENDM
 
 COIN_EFFECT MACRO X, Y    
@@ -1230,18 +1240,22 @@ DISPLAY_SCORE_P2 PROC
 	RET
 ENDP
 
+HIDE_MOUSE PROC
+	MOV AX, 1
+	INT 33H
+	MOV AX, 2
+	INT 33H
+	RET
+ENDP
+
 MAIN PROC FAR
 	MOV AX, @DATA
 	MOV DS, AX
 	MOV ES, AX
 	
-	; Hide the mouse pointer
-	MOV AX, 1
-	INT 33H
-	MOV AX, 2
-	INT 33H
-
+	CALL HIDE_MOUSE
 	CALL CHANGE_TO_VIDEO
+
 	CALL DRAW_GRID
 
 	CALL DISPLAY_WORD_SCORE
@@ -1252,26 +1266,26 @@ MAIN PROC FAR
 	DRAW_PLAYER PLAYER_IMG, X_POS, Y_POS
 	DRAW_PLAYER PLAYER_IMG2, X_POS2, Y_POS2
 
-	Draw_Box 30, 15, 14
-	Draw_Box 110, 144, 13
-	Draw_Box 270, 144, 12
-	DRAW_Box 350, 58, 13
-	DRAW_Box 510, 187, 14
-	DRAW_Box 350, 230, 13
-	Draw_Box 590, 230, 12
-	DRAW_Box 590, 316, 13
+	DRAW_BOX 30, 15, 14
+	DRAW_BOX 110, 144, 13
+	DRAW_BOX 270, 144, 12
+	DRAW_BOX 350, 58, 13
+	DRAW_BOX 510, 187, 14
+	DRAW_BOX 350, 230, 13
+	DRAW_BOX 590, 230, 12
+	DRAW_BOX 590, 316, 13
 
-	DRAW_COIN_IMG 127, 30
-	DRAW_COIN_IMG 287, 202
-	DRAW_COIN_IMG 207, 116
-	DRAW_COIN_IMG 367, 30
-	DRAW_COIN_IMG 607, 288 ;x = 447
-	DRAW_COIN_IMG 127, 202
-	DRAW_COIN_IMG 207, 288
-	DRAW_COIN_IMG 527, 116
-	DRAW_COIN_IMG 367, 30
-	DRAW_COIN_IMG 447, 73
-	DRAW_COIN_IMG 127, 116
+	DRAW_COIN 127, 30
+	DRAW_COIN 287, 202
+	DRAW_COIN 207, 116
+	DRAW_COIN 367, 30
+	DRAW_COIN 607, 288 ;x = 447
+	DRAW_COIN 127, 202
+	DRAW_COIN 207, 288
+	DRAW_COIN 527, 116
+	DRAW_COIN 367, 30
+	DRAW_COIN 447, 73
+	DRAW_COIN 127, 116
 
 	CALL Draw_RAND_Coin
 

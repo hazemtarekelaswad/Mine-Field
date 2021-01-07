@@ -138,8 +138,6 @@ STATUS_PURPLE_LEN	EQU	24
 WIN_MSG1		DB 'PLAYER 1 WINS'
 WIN_MSG2        DB 'PLAYER 2 WINS'
 
-CONTAINS_FLAG	DB 0
-
 .CODE
 
 ;		Key						scancode
@@ -607,42 +605,6 @@ CHANGE_TO_VIDEO PROC
 	; MOV AH,0Bh 
 	RET
 ENDP
-
-; Works with 80 X 43 px cell size
-; CONTAINS_FLAG is set if it finds the passed color in the cell
-CONTAINS MACRO X, Y, COLOR
-LOCAL Y_CO, X_CO, EXISTS, FINISHED
-	MOV CX, X
-	MOV DX, Y
-
-	MOV BX, X
-
-	MOV SI, 80
-	ADD SI, CX
-
-	MOV DI, 43
-	ADD DI, DX
-	MOV CONTAINS_FLAG, 0
-
-	Y_CO:
-		X_CO:
-			MOV AH, 0DH
-			INT 10H
-			CMP AL, COLOR
-			JE EXISTS
-			INC CX
-			CMP CX, SI
-		JNE X_CO
-
-		MOV CX, BX
-		INC DX
-		CMP DX, DI
-	JNE Y_CO
-	JMP FINISHED
-EXISTS:
-	MOV CONTAINS_FLAG, 1
-FINISHED:
-ENDM
 
 ; Don't pass registers
 STORE_IMG_16 MACRO X, Y

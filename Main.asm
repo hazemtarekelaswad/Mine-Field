@@ -428,7 +428,7 @@ DRAW_RECT MACRO X, Y, LEN, WID
 LOCAL DRAW_WID, DRAW_LEN
     MOV CX, X           ; X-Pos
     MOV DX, Y           ; Y-Pos
-    MOV AX, 0C0CH       ; AH: Draw Pixel | AL: Color
+    MOV AX, 0C0EH       ; AH: Draw Pixel | AL: Color
 
     ; Draw the right and left sides
     MOV BX, WID
@@ -1573,6 +1573,7 @@ END_GAME:
 
 ;	CONVERT_TO_ASCII SCORE_P1
 ;	CONVERT_TO_ASCII SCORE_P2
+	DRAW_RECT 200, 180, 220, 40
 
 	MOV AX, SCORE_P1
 	CMP AX, SCORE_P2
@@ -1590,7 +1591,7 @@ END_GAME:
 
 
 END_PROGRAM:
-
+HLT
 MAIN ENDP
 END MAIN
 

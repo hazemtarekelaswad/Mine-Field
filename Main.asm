@@ -89,7 +89,7 @@ AQUA_BOX 		DB 470 DUP(11)
 RED_BOX 		DB 470 DUP(12)	; Resets player's score
 PURPLE_BOX 		DB 470 DUP(13)	; Lets the player choose a feature to proceed
 YELLOW_BOX 		DB 470 DUP(14)	; Increases player's score by 15
-WHILE_BOX 		DB 470 DUP(15)
+WHITE_BOX 		DB 470 DUP(15)	; Adds a red box near the other player
 
 
 TEMP_WID_16		EQU 16
@@ -132,29 +132,33 @@ SCORE_P1 	DW 0, ?, ?
 SCORE_P2 	DW 0, ?, ?
 MAX_SCORE 	EQU 100
 
-STATUS_PURPLE 		DB 'Choose a Box (Y / G / B)'
-STATUS_PURPLE_LEN	EQU	24
+STATUS_PURPLE 		DB 'Choose a Box (Y / G / B / T)'
+STATUS_PURPLE_LEN	EQU	28
 
 WIN_MSG1		DB 'PLAYER 1 WINS'
 WIN_MSG2        DB 'PLAYER 2 WINS'
+
+GAME_LEVEL	DB 2
 
 .CODE
 
 ;		Key						scancode
 ;		
-; 	    White Up Arrow             48
-;       White Left Arrow           4B
-;       White Right Arrow          4D
-;       White Down Arrow           50
-;       w                          11
-;       a                          1E
-;       s                          1F
-;       d                          20
+; 	    Up Arrow             	   	48
+;       Left Arrow           	   	4B
+;       Right Arrow          	   	4D
+;       Down Arrow           	   	50
+;       w                          	11
+;       a                          	1E
+;       s                          	1F
+;       d                          	20
 
-;    	r                          13 
-;     	y                          15 
-;    	g                          22 
-; 		b                          30
+;    	r                          	13 
+;     	y                          	15 
+;    	g                          	22 
+; 		b                          	30
+;		q                          	10
+;		t						   	14
                     
 
 
@@ -1072,9 +1076,10 @@ TERMINATE:
 ENDM
 
 PURPLE_BOX_EFFECT MACRO X, Y
-LOCAL TERMINATE, BLUE, YELLOW, GREEN
+LOCAL TERMINATE, BLUE, YELLOW, GREEN, WHITE
 LOCAL P2, CALC_2, CALC, RESET, RESET2
 LOCAL GETMAX, GETMAX2, REPEAT, PLAYER2
+LOCAL TER, BORDER2, BORDER1, PLR2
     MOV CX, X
 	SUB CX, 26
 	MOV DX, Y
@@ -1086,7 +1091,7 @@ LOCAL GETMAX, GETMAX2, REPEAT, PLAYER2
     COMPARE_OBJS PURPLE_BOX, TEMP_BOX, BOX_PXS
     JNE TERMINATE
 
-	DISPLAY_STATUS 27, 23, STATUS_PURPLE_LEN, STATUS_PURPLE
+	DISPLAY_STATUS 24, 23, STATUS_PURPLE_LEN, STATUS_PURPLE
 
 	MOV SI, X 
     CMP SI, X_POS
@@ -1115,7 +1120,8 @@ REPEAT:
 	JE YELLOW
 	CMP AH, 22H		; G
 	JE GREEN
-	
+	CMP AH, 14H		; T
+	JE WHITE
 	JMP REPEAT
 
 ; requires modifications after adding its feature
@@ -1182,8 +1188,140 @@ GREEN:
 	Mov Score_P1, 0
 	JMP TERMINATE
 
+WHITE:
+
+	MOV SI, X 
+    CMP SI, X_POS
+    JNE PLAYER2
+
+	MOV SI, Y
+	CMP SI, Y_POS
+	JNE PLAYER2
+
+	CMP X_POS2, 616
+	JE BORDER2
+
+	MOV CX, X_POS2
+	ADD CX, 54
+	MOV TEMP_X, CX
+
+	MOV CX, Y_POS2
+	SUB CX, 22
+	MOV TEMP_Y, CX
+
+	JMP TER
+
+	BORDER2:
+	MOV CX, X_POS2
+	SUB CX, 106
+	MOV TEMP_X, CX
+
+	MOV CX, Y_POS2
+	SUB CX, 22
+	MOV TEMP_Y, CX
+
+	JMP TER
+
+	PLR2:
+	CMP X_POS, 616
+	JE BORDER1
+
+	MOV CX, X_POS
+	ADD CX, 54
+	MOV TEMP_X, CX
+
+	MOV CX, Y_POS
+	SUB CX, 22
+	MOV TEMP_Y, CX
+
+	JMP TER
+
+	BORDER1:
+	MOV CX, X_POS
+	SUB CX, 106
+	MOV TEMP_X, CX
+
+	MOV CX, Y_POS
+	SUB CX, 22
+	MOV TEMP_Y, CX
+
+	TER:
+	DRAW_BOX TEMP_X, TEMP_Y, 12
 TERMINATE:
-	CLEAR_STATUS 27, 23, STATUS_PURPLE_LEN, STATUS_PURPLE 
+	CLEAR_STATUS 24, 23, STATUS_PURPLE_LEN, STATUS_PURPLE 
+ENDM
+
+WHITE_BOX_EFFECT MACRO X, Y
+	LOCAL TERMINATE, PLAYER2, BORDER1, BORDER2
+    MOV CX, X
+	SUB CX, 26
+	MOV DX, Y
+	SUB DX, 22
+	MOV TEMP_X, CX
+	MOV TEMP_Y, DX
+
+	STORE_BOX TEMP_X, TEMP_Y
+    COMPARE_OBJS WHITE_BOX, TEMP_BOX, BOX_PXS
+    JNE TERMINATE
+
+	MOV SI, X 
+    CMP SI, X_POS
+    JNE PLAYER2
+
+	MOV SI, Y
+	CMP SI, Y_POS
+	JNE PLAYER2
+
+
+	CMP X_POS2, 616
+	JE BORDER2
+
+	MOV CX, X_POS2
+	ADD CX, 54
+	MOV TEMP_X, CX
+
+	MOV CX, Y_POS2
+	SUB CX, 22
+	MOV TEMP_Y, CX
+
+	JMP TERMINATE
+
+	BORDER2:
+	MOV CX, X_POS2
+	SUB CX, 106
+	MOV TEMP_X, CX
+
+	MOV CX, Y_POS2
+	SUB CX, 22
+	MOV TEMP_Y, CX
+
+	JMP TERMINATE
+
+PLAYER2:
+	CMP X_POS, 616
+	JE BORDER1
+
+	MOV CX, X_POS
+	ADD CX, 54
+	MOV TEMP_X, CX
+
+	MOV CX, Y_POS
+	SUB CX, 22
+	MOV TEMP_Y, CX
+
+	JMP TERMINATE
+
+	BORDER1:
+	MOV CX, X_POS
+	SUB CX, 106
+	MOV TEMP_X, CX
+
+	MOV CX, Y_POS
+	SUB CX, 22
+	MOV TEMP_Y, CX
+
+TERMINATE:
+	DRAW_BOX TEMP_X, TEMP_Y, 12
 ENDM
 
 COIN_EFFECT MACRO X, Y    
@@ -1229,12 +1367,19 @@ TERMINATE:
 ENDM
 
 APPLY_EFFECTS MACRO X, Y
+LOCAL TERMINATE
 	COIN_EFFECT X, Y
 	RED_BOX_EFFECT X, Y
 	YELLOW_BOX_EFFECT X, Y
 	GREEN_BOX_EFFECT X, Y
 	PURPLE_BOX_EFFECT X, Y
 	BLUE_BOX_EFFECT X, Y
+
+	CMP GAME_LEVEL, 2
+	JNE TERMINATE
+
+	WHITE_BOX_EFFECT X, Y
+TERMINATE:
 ENDM
 
 DISPLAY_SCORE_P1 PROC
@@ -1287,13 +1432,13 @@ MAIN PROC FAR
 	DRAW_PLAYER PLAYER_IMG, X_POS, Y_POS
 	DRAW_PLAYER PLAYER_IMG2, X_POS2, Y_POS2
 
-	DRAW_BOX 30, 15, 14
+	DRAW_BOX 30, 15, 15
 	DRAW_BOX 110, 144, 12
-	DRAW_BOX 270, 144, 9
-	DRAW_BOX 350, 58, 13
+	DRAW_BOX 270, 144, 15
+	DRAW_BOX 350, 58, 15
 	DRAW_BOX 510, 187, 10
 	DRAW_BOX 350, 230, 10
-	DRAW_BOX 590, 230, 12
+	DRAW_BOX 590, 230, 15
 	DRAW_BOX 590, 316, 14
 
 	DRAW_COIN 127, 30
@@ -1537,7 +1682,7 @@ MAIN PROC FAR
 			DRAW_PLAYER PLAYER_IMG2, X_POS2, Y_POS2
 
 			CALL DRAW_RAND_COIN
-			DRAW_RAND_BOX 12
+			;DRAW_RAND_BOX 13
 		JMP INFINITE
 
 		S_KEY:

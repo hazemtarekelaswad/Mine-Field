@@ -138,7 +138,14 @@ STATUS_PURPLE_LEN	EQU	24
 WIN_MSG1		DB 'PLAYER 1 WINS'
 WIN_MSG2        DB 'PLAYER 2 WINS'
 
-GAME_LEVEL	DB 2
+GAME_LEVEL	DB 1
+
+LVL_MSG	 DB 'Choose Level:'
+LVL1_MSG DB '* Press F1 for Level 1' 
+LVL2_MSG DB '* Press F1 for Level 2'
+ERROR_MSG DB 'ERROR: you entered a wrong key, please Re-enter F1 or F2:'
+
+GAME_DESCRIPTION	DB 'Here some instructions for you:',10,13,10,13,'1. The Left player move it using (w, s, a, d)',10,13,'while the right one move it by the ordinary arrows.',10,13,10,13,'2. The coins are always good for you.',10,13,10,13,'3. Take care about boxes:',10,13,10,13,'- Red box:',9,'Make your score 0 (Be careful).',10,13,'- Green box:',9,'Decrease your enemy score by 20.',10,13,'- Yellow box:',9,'increment your score by 15.' ,10,13,'- Blue box:',9,'Remove the red boxes (bombs) from the grid.',10,13,'- Purple box:',9,'Let you choose one of the previous feature.',10,13,'- White box:',9,'Put a bomb (Red box) near your enemy.',10,13,'- Aqua box:',9,'Remove all objects (boxes and coins) around the other player',10,13,10,13,'4. You won when your score reaches 100.',10,13,10,13,10,13,'Press Any Key To Continue...$'
 
 .CODE
 
@@ -156,7 +163,11 @@ GAME_LEVEL	DB 2
 ;    	r                          	13 
 ;     	y                          	15 
 ;    	g                          	22 
-; 		b                          	30                    
+; 		b                          	30  
+
+;		F1                         	3B
+;    	F2                         	3C     
+;		Space                      	39             
 
 
 ; Draws 8 X 8 Grid with 640 X 350 px of screen dimensions (VIDEO MODE AX = 0010H OR AX = 4F02H, BX = 0100) 
@@ -844,7 +855,7 @@ DRAW_RAND_COIN PROC
 
     call RandGen
 	Mov Ax, 43 
-	dec dl
+	sub dl, 2
     Mul dl
 	Add Ax, 30
 
@@ -1456,12 +1467,66 @@ HIDE_MOUSE PROC
 	RET
 ENDP
 
+CHOOSE_LEVEL PROC
+	CALL CHANGE_TO_VIDEO
+	DISPLAY_STATUS 32, 11, 12, LVL_MSG
+	DISPLAY_STATUS 30, 13, 22, LVL1_MSG
+	DISPLAY_STATUS 30, 14, 22, LVL2_MSG 
+	
+	REPEAT:
+		MOV AH, 0
+		INT 16H
+
+		CMP AH, 3BH		;F1
+		JE CH_LVL1
+
+		CMP AH, 3CH		;F2
+		JE CH_LVL2
+
+		JMP REPEAT1   
+
+	CH_LVL1:
+		MOV GAME_LEVEL, 1
+	JMP TER
+	CH_LVL2:
+		MOV GAME_LEVEL, 2
+	JMP TER
+    REPEAT1:
+	DISPLAY_STATUS 12, 20, 57, ERROR_MSG
+	JMP REPEAT
+TER:
+RET
+ENDP
+
+CHANGE_TO_TEXT PROC
+	MOV AX, 3
+	INT 10H
+RET
+ENDP
+
+GAME_DESC PROC
+	CALL CHANGE_TO_TEXT
+	MOV AX, 0900H
+	MOV DX, OFFSET GAME_DESCRIPTION
+	INT 21H
+
+	MOV AH, 0
+	INT 16H
+RET
+ENDP
+
 MAIN PROC FAR
 	MOV AX, @DATA
 	MOV DS, AX
 	MOV ES, AX
-	
+
 	CALL HIDE_MOUSE
+
+	CALL GAME_DESC
+
+	CALL CHOOSE_LEVEL
+
+
 	CALL CHANGE_TO_VIDEO
 
 	CALL DRAW_GRID
@@ -1471,14 +1536,26 @@ MAIN PROC FAR
 	DRAW_PLAYER PLAYER_IMG, X_POS, Y_POS
 	DRAW_PLAYER PLAYER_IMG2, X_POS2, Y_POS2
 
-	DRAW_BOX 30, 15, 15
-	DRAW_BOX 110, 144, 12
-	DRAW_BOX 270, 144, 15
-	DRAW_BOX 350, 58, 11
-	DRAW_BOX 510, 187, 10
-	DRAW_BOX 350, 230, 10
-	DRAW_BOX 590, 230, 11
+	DRAW_BOX 350, 273, 9
+	DRAW_BOX 190, 58, 10
+	DRAW_BOX 350, 144, 10
+	DRAW_BOX 430, 230, 12
+	DRAW_BOX 270, 230, 12
+	DRAW_BOX 270, 144, 12
+	DRAW_BOX 430, 144, 12
+	DRAW_BOX 350, 187, 13
+	DRAW_BOX 30, 15, 14
+    DRAW_BOX 270, 101, 14
 	DRAW_BOX 590, 316, 14
+
+	CMP GAME_LEVEL, 2
+	JNE LVL1
+
+	DRAW_BOX 350, 58, 11
+	DRAW_BOX 190, 230, 15
+	DRAW_BOX 510, 187, 15
+
+	LVL1:
 
 	DRAW_COIN 127, 30
 	DRAW_COIN 287, 202
@@ -1493,7 +1570,6 @@ MAIN PROC FAR
 	DRAW_COIN 127, 116	
 	DRAW_COIN 207, 202
 	DRAW_COIN 287, 288
-	DRAW_COIN 367, 159
 	DRAW_COIN 447, 202
 	DRAW_COIN 287, 73
 	DRAW_COIN 47, 159
@@ -1864,7 +1940,7 @@ MAIN PROC FAR
 			DRAW_RAND_BOX 15
 			CALL DRAW_RAND_COIN
 			DRAW_RAND_BOX 11
-			
+
 	JMP INFINITE
 	
 

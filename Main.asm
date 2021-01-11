@@ -3,6 +3,67 @@
 .STACK 64
 .DATA 
 
+;1st screen output messages     ;13,10,;13 carriage etrurn ,10 line feed
+User_mes1 db "Please enter your Name: ",'$'         
+Press_mes2 db "Press Enter key to continue",'$'
+userName1 db 15,?, 15 dup('$') 
+LEN_username1 EQU $-userName1
+User_mes2 db "Please enter 2nd player Name: ",'$' 
+userName2 db 15,?, 15 dup('$')   
+LEN_username2 EQU $-userName2
+;2nd screen output messages 
+mes1 db "*To start chatting press F1 ",'$'         
+mes2 db "*To start MineField game press F2",'$' 
+mes3 db "*To end the program press ESC",'$' ;13,10, 
+mes4 db " - You sent a chat invitation to ",'$'  ;;      
+;;;mes5 db "   sent you a game invitation, to accept press F2",'$'  ;------>>>>still need to connect this with user name
+mes5 db " - Press F2 To accept the game invitation sent by ",'$' 
+
+mes6 db " - Press F3 To End Chatting ",'$' ;with 
+PRINTCOLON db ' :', '$'
+    
+sentCharacter db '$'
+AboveXcursor db 0
+AboveYcursor db 2
+Above equ 1
+AboveColor equ 52
+receivedCharacter db '$'
+BelowXcursor db 0
+BelowYcursor db 14
+Below equ 2
+BelowColor equ 07
+   
+SCORE_MSG 	DB ':Score:'
+; Score, Number of digits, Score as a string
+SCORE_P1 	DW 0, ?, ?
+SCORE_P2 	DW 0, ?, ?
+MAX_SCORE 	EQU 100
+
+STATUS_PURPLE 		DB 'Choose a Box (Y / G / B)'
+STATUS_PURPLE_LEN	EQU	24
+
+WIN_MSG1		DB 'PLAYER 1 WINS'
+WIN_MSG2        DB 'PLAYER 2 WINS'
+
+GAME_LEVEL	DB 1
+
+LVL_MSG	 DB 'Choose Level:'
+LVL1_MSG DB '* Press F1 for Level 1' 
+LVL2_MSG DB '* Press F2 for Level 2'
+ERROR_MSG DB 'ERROR: you entered a wrong key, please Re-enter F1 or F2:'
+
+GAME_DESCRIPTION DB '  Here are some instructions for you:',10,13,10,13 ;,?
+                DB '  1. The Left player move it using (w, s, a, d)',10,13
+                DB '  while the right one move it by the ordinary arrows.',10,13,10,13
+                DB '  2. The coins are always good for you.',10,13,10,13
+                DB '  3. Take care about boxes:',10,13,10,13,'  - Red box:',9,'  Make your score 0 (Be careful).',10,13
+                DB '  - Green box:',9,'Decrease your enemy score by 20.',10,13,'  - Yellow box:',9,'increment your score by 15.' ,10,13
+                DB '  - Blue box:',9,'Remove the red boxes (bombs) from the grid.',10,13,'  - Purple box:',9,'Let you choose one of the previous feature.',10,13
+                DB '  - White box:',9,'Put a bomb (Red box) near your enemy.',10,13,'  - Aqua box:',9,'Remove all objects (boxes and coins) around the other player',10,13,10,13
+                DB '  4. You won when your score reaches 100.',10,13,10,13,10,13
+                DB '  Press Any Key To Continue...$'
+
+
 ; Meo.bmp data
 IMG_WID EQU 32
 IMG_HEIGHT EQU 32
@@ -125,27 +186,6 @@ Y_RAND_BOX  DW ?
 X_RAND_COIN DW ?
 Y_RAND_COIN DW ?
 
-
-SCORE_MSG 	DB ':Score:'
-; Score, Number of digits, Score as a string
-SCORE_P1 	DW 0, ?, ?
-SCORE_P2 	DW 0, ?, ?
-MAX_SCORE 	EQU 100
-
-STATUS_PURPLE 		DB 'Choose a Box (Y / G / B)'
-STATUS_PURPLE_LEN	EQU	24
-
-WIN_MSG1		DB 'PLAYER 1 WINS'
-WIN_MSG2        DB 'PLAYER 2 WINS'
-
-GAME_LEVEL	DB 1
-
-LVL_MSG	 DB 'Choose Level:'
-LVL1_MSG DB '* Press F1 for Level 1' 
-LVL2_MSG DB '* Press F1 for Level 2'
-ERROR_MSG DB 'ERROR: you entered a wrong key, please Re-enter F1 or F2:'
-
-GAME_DESCRIPTION	DB 'Here some instructions for you:',10,13,10,13,'1. The Left player move it using (w, s, a, d)',10,13,'while the right one move it by the ordinary arrows.',10,13,10,13,'2. The coins are always good for you.',10,13,10,13,'3. Take care about boxes:',10,13,10,13,'- Red box:',9,'Make your score 0 (Be careful).',10,13,'- Green box:',9,'Decrease your enemy score by 20.',10,13,'- Yellow box:',9,'increment your score by 15.' ,10,13,'- Blue box:',9,'Remove the red boxes (bombs) from the grid.',10,13,'- Purple box:',9,'Let you choose one of the previous feature.',10,13,'- White box:',9,'Put a bomb (Red box) near your enemy.',10,13,'- Aqua box:',9,'Remove all objects (boxes and coins) around the other player',10,13,10,13,'4. You won when your score reaches 100.',10,13,10,13,10,13,'Press Any Key To Continue...$'
 
 .CODE
 
@@ -372,7 +412,7 @@ DRAW_GRID PROC
 	CMP CX, 639
 	JNZ hleight
 	RET
-ENDP
+DRAW_GRID ENDP
 
 ; This macro does not accept X = 0 or Y = 0 as parameters
 ; It is recommended that X >= IMG_WID and Y >= IMG_HEIGHT
@@ -406,7 +446,7 @@ LOCAL START, DRAW
 	    DEC DX     
 		CMP DX, DI
 	JNE  DRAW   	
-ENDM
+ENDM DRAW_IMAGE
 
 ; This macro changes each pixel of the player to black 
 CLEAR_PLAYER MACRO X, Y
@@ -434,7 +474,7 @@ CLEAR_PLAYER MACRO X, Y
 	    DEC DX     
 		CMP DX, DI
 	JNE  CLEAR   
-ENDM
+ENDM CLEAR_PLAYER
 
 DRAW_RECT MACRO X, Y, LEN, WID
 LOCAL DRAW_WID, DRAW_LEN
@@ -467,7 +507,7 @@ LOCAL DRAW_WID, DRAW_LEN
     JNE DRAW_LEN
     INT 10H
 
-ENDM
+ENDM DRAW_RECT
 
 DRAW_CUBOID MACRO X, Y, LEN, WID, HEIGHT
 LOCAL DRAW_WID, DRAW_LEN, DRAW_HEIGHT, RIGHT, TOP
@@ -514,7 +554,7 @@ LOCAL DRAW_WID, DRAW_LEN, DRAW_HEIGHT, RIGHT, TOP
     JNZ TOP
     INT 10H
 
-ENDM
+ENDM DRAW_CUBOID
 
 DRAW_FILLED_RECT MACRO X, Y, LEN, WID, COLOR
 LOCAL DRAW_WID, DRAW_LEN, FILL
@@ -539,7 +579,7 @@ LOCAL DRAW_WID, DRAW_LEN, FILL
         INC DX
         CMP DX, BX
     JNE DRAW_WID
-ENDM
+ENDM DRAW_FILLED_RECT
 
 DRAW_FILLED_CUBOID MACRO X, Y, LEN, WID, HEIGHT, COLOR
 LOCAL DRAW, FILL_HEIGHT, FILL_LEN
@@ -591,23 +631,23 @@ LOCAL DRAW, FILL_HEIGHT, FILL_LEN
         DEC DX
         CMP DX, BX
     JNE DRAW
-ENDM
+ENDM DRAW_FILLED_CUBOID
 
 ; initial X = 30
 ; initial Y = 15
 DRAW_BOX MACRO X, Y, colour
 	DRAW_FILLED_CUBOID X, Y, 16, 12, 16, colour
-ENDM
+ENDM DRAW_BOX
 
 ; initial X = 47
 ; initial Y = 30
 DRAW_COIN MACRO X, Y
 	DRAW_IMAGE DOLLAR, X, Y, IMG_WID3, IMG_HEIGHT3
-ENDM
+ENDM DRAW_COIN
 
 DRAW_PLAYER MACRO PLAYER_IMG, X, Y
 	DRAW_IMAGE PLAYER_IMG, X, Y, IMG_WID, IMG_HEIGHT
-ENDM
+ENDM DRAW_PLAYER
 
 CHANGE_TO_VIDEO PROC 
 	; Change to video mode 640 X 400 X 256
@@ -616,7 +656,7 @@ CHANGE_TO_VIDEO PROC
     int 10h        
 	; MOV AH,0Bh 
 	RET
-ENDP
+CHANGE_TO_VIDEO ENDP
 
 ; Don't pass registers
 STORE_IMG_16 MACRO X, Y
@@ -649,7 +689,7 @@ LOCAL STORE, START
 	    DEC DX     
 		CMP DX, DI
 	JNE STORE 
-ENDM
+ENDM STORE_IMG_16
 
 STORE_IMG_32 MACRO X, Y
 LOCAL STORE, START
@@ -679,7 +719,7 @@ LOCAL STORE, START
 	    DEC DX     
 		CMP DX, DI
 	JNE STORE 
-ENDM
+ENDM STORE_IMG_32
 
 STORE_BOX MACRO X, Y
 LOCAL READ_HEIGHT, FILL, DRAW, FILL_LEN, FILL_HEIGHT
@@ -764,7 +804,7 @@ LOCAL READ_HEIGHT, FILL, DRAW, FILL_LEN, FILL_HEIGHT
         DEC DX
         CMP DX, BX
     JNE DRAW
-ENDM
+ENDM STORE_BOX
 
 ; Use JE or JNE after comparing, if needed
 COMPARE_OBJS MACRO OBJ1, OBJ2, NUM_OF_PX
@@ -772,7 +812,7 @@ COMPARE_OBJS MACRO OBJ1, OBJ2, NUM_OF_PX
 	LEA DI, OBJ2
 	MOV CX, NUM_OF_PX
 	REPE CMPSB
-ENDM
+ENDM COMPARE_OBJS
 
 STORE_IMG_RELATIVE PROC
 	MOV CX, X_POS
@@ -783,7 +823,7 @@ STORE_IMG_RELATIVE PROC
 	MOV TEMP_Y, DX
 	STORE_IMG_16 TEMP_X, TEMP_Y
 	RET
-ENDP
+STORE_IMG_RELATIVE ENDP
 
 RANDGEN PROC
    ; A procedure which produce a random value in dx 
@@ -799,7 +839,7 @@ RANDGEN PROC
    ;mov ah, 2h   ; call interrupt to display a value in DL
    ;int 21h    
 	RET
-ENDP
+RANDGEN ENDP
     
 DRAW_RAND_BOX MACRO Colour 
    Local ReGenRand1, ReGenRand2 , TERMINATE
@@ -835,7 +875,7 @@ DRAW_RAND_BOX MACRO Colour
 
 	DRAW_BOX X_RAND_Box, Y_RAND_Box , Colour
 TERMINATE:
-ENDM
+ENDM DRAW_RAND_BOX
 
 DRAW_RAND_COIN PROC
 	ReGenRandCoin1:
@@ -871,7 +911,7 @@ DRAW_RAND_COIN PROC
 	DRAW_COIN X_RAND_COin, Y_RAND_Coin
 TERMINATE:
 	RET
-ENDP
+DRAW_RAND_COIN ENDP
 
 CONVERT_TO_ASCII MACRO SCORE
 LOCAL next_digit, divide
@@ -898,7 +938,7 @@ next_digit:
     mov [SI], AL        ; write it to the buffer
     inc si
     loop next_digit
-ENDM
+ENDM CONVERT_TO_ASCII
 
 DISPLAY_STATUS MACRO X, Y, LEN, MSG
 	MOV AX,1300H 					;To print string in the graphical mode
@@ -908,7 +948,7 @@ DISPLAY_STATUS MACRO X, Y, LEN, MSG
     MOV DL,X 						;X coordinate
     MOV BP,OFFSET MSG 		;Moves to bp the offset of the string
     INT 10H
-ENDM 
+ENDM DISPLAY_STATUS
 
 CLEAR_STATUS MACRO X, Y, LEN, MSG
 	MOV AX,1300H 					;To print string in the graphical mode
@@ -918,12 +958,12 @@ CLEAR_STATUS MACRO X, Y, LEN, MSG
     MOV DL,X 						;X coordinate
     MOV BP,OFFSET MSG 		;Moves to bp the offset of the string
     INT 10H
-ENDM 
+ENDM CLEAR_STATUS
 
 DISPLAY_WORD_SCORE PROC 
     DISPLAY_STATUS 35, 22, 7, SCORE_MSG
     RET
- ENDP 
+DISPLAY_WORD_SCORE ENDP 
 
 RED_BOX_EFFECT MACRO X, Y
 LOCAL TERMINATE, Calc_2
@@ -951,7 +991,7 @@ LOCAL TERMINATE, Calc_2
 CALC_2: 
 	MOV SCORE_P2, 0
 TERMINATE: 
-ENDM
+ENDM RED_BOX_EFFECT
 
 YELLOW_BOX_EFFECT MACRO X, Y
 LOCAL TERMINATE, Calc_2, GetMax, GetMax2
@@ -995,7 +1035,7 @@ CALC_2:
 	GetMax2: 
 	Mov Score_P2, 100
 TERMINATE: 
-ENDM
+ENDM YELLOW_BOX_EFFECT
 
 GREEN_BOX_EFFECT MACRO X, Y
 LOCAL TERMINATE, Calc_2, Reset, Reset2
@@ -1037,7 +1077,7 @@ CALC_2:
 	Reset2: 
 	Mov Score_P1, 0
 TERMINATE: 
-ENDM
+ENDM GREEN_BOX_EFFECT
 
 CLEAR_RED_BOXES PROC
 	MOV CX, 0
@@ -1065,7 +1105,7 @@ REPEAT_Y:
 	CMP DX, DI
 JNE REPEAT_Y
 	RET
-ENDP
+CLEAR_RED_BOXES ENDP
 
 BLUE_BOX_EFFECT MACRO X, Y
 LOCAL TERMINATE
@@ -1081,7 +1121,7 @@ LOCAL TERMINATE
     JNE TERMINATE
 	CALL CLEAR_RED_BOXES
 TERMINATE:
-ENDM
+ENDM BLUE_BOX_EFFECT
 
 PURPLE_BOX_EFFECT MACRO X, Y
 LOCAL TERMINATE, BLUE, YELLOW, GREEN
@@ -1196,7 +1236,7 @@ GREEN:
 
 TERMINATE:
 	CLEAR_STATUS 27, 23, STATUS_PURPLE_LEN, STATUS_PURPLE 
-ENDM
+ENDM PURPLE_BOX_EFFECT
 
 WHITE_BOX_EFFECT MACRO X, Y
 	LOCAL TERMINATE, PLAYER2, BORDER1, BORDER2
@@ -1269,7 +1309,7 @@ PLAYER2:
 
 TERMINATE:
 	DRAW_BOX TEMP_X, TEMP_Y, 12
-ENDM
+ENDM WHITE_BOX_EFFECT
 
 AQUA_BOX_EFFECT MACRO X, Y
 LOCAL TERMINATE, PLAYER2
@@ -1370,7 +1410,7 @@ LOCAL LEFT2, ABOVE2, BELOW2
 	CLEAR_PLAYER X_POS, TEMP_Y
 
 	TERMINATE:
-ENDM
+ENDM AQUA_BOX_EFFECT
 
 COIN_EFFECT MACRO X, Y    
 LOCAL TERMINATE, Calc_2, Win1, Win2
@@ -1412,7 +1452,7 @@ Win2:
     Mov Score_P2,100
 
 TERMINATE: 
-ENDM
+ENDM COIN_EFFECT
 
 APPLY_EFFECTS MACRO X, Y
 LOCAL TERMINATE
@@ -1430,7 +1470,7 @@ LOCAL TERMINATE
 	WHITE_BOX_EFFECT X, Y
 
 TERMINATE:
-ENDM
+ENDM APPLY_EFFECTS
 
 DISPLAY_SCORE_P1 PROC
 
@@ -1444,7 +1484,7 @@ DISPLAY_SCORE_P1 PROC
 	MOV BP, OFFSET SCORE_P1+4
 	INT 10H
 	RET
-ENDP
+DISPLAY_SCORE_P1 ENDP
 
 DISPLAY_SCORE_P2 PROC
 	CONVERT_TO_ASCII SCORE_P2
@@ -1457,7 +1497,7 @@ DISPLAY_SCORE_P2 PROC
 	MOV BP, OFFSET SCORE_P2+4
 	INT 10H
 	RET
-ENDP
+DISPLAY_SCORE_P2 ENDP
 
 HIDE_MOUSE PROC
 	MOV AX, 1
@@ -1465,7 +1505,7 @@ HIDE_MOUSE PROC
 	MOV AX, 2
 	INT 33H
 	RET
-ENDP
+HIDE_MOUSE ENDP
 
 CHOOSE_LEVEL PROC
 	CALL CHANGE_TO_VIDEO
@@ -1496,13 +1536,13 @@ CHOOSE_LEVEL PROC
 	JMP REPEAT
 TER:
 RET
-ENDP
+CHOOSE_LEVEL ENDP
 
 CHANGE_TO_TEXT PROC
 	MOV AX, 3
 	INT 10H
 RET
-ENDP
+CHANGE_TO_TEXT ENDP
 
 GAME_DESC PROC
 	CALL CHANGE_TO_TEXT
@@ -1513,7 +1553,589 @@ GAME_DESC PROC
 	MOV AH, 0
 	INT 16H
 RET
-ENDP
+GAME_DESC ENDP
+
+
+clearscreen proc
+  mov ah,0
+  mov al,3
+  int 10H 
+  ret
+clearscreen endp
+
+AskForUserName proc 
+    mov ah,2
+    mov dx,0C16h     ;Set/Move Cursor to Middle postion
+    int 10h
+    
+    mov ah,9
+    mov dx,offset User_mes1   ;print message
+    int 21h 
+     
+    ReEnterName:       
+    mov ah,2
+    mov dx,0D16h      ;Set/Move Cursor to Middle postion (incremented row by 1)
+    int 10h 
+    
+    mov ah,0Ah         ;Read user name from keyboard
+    mov dx,offset userName1
+    int 21h   
+    
+    LEA bx,userName1   ;or mov bx,offset userName   
+    
+    ;Validation of First Letter  
+    
+    mov al,[bx]+2 ;because first byte is F->15
+    CMP al,'A';41h ;if Ascii less than A then its a special character
+    JB ReEnterName  
+    ;or JC      
+    CMP al,'z' ;7Ah
+    JA ReEnterName  ;if Ascii greater than z then its a special character
+    ;or JNC  
+    mov cl, 96   ;move the character just before "a" to cl 
+    sub cl, al    ;do cl=cl-al ===> al contains the first letter of user name,,store the difference in cl,,say N"78" was first letter
+
+    cmp cl, 6       ;if difference in cl is smaller than 6, then invalid
+    JB ReEnterName        ;special characters from 91d to 96d  
+    ;or JC
+    ;-------------------------------------------------------------other user name
+    mov ah,2
+    mov dx,0E16h     ;Set/Move Cursor to Middle postion
+    int 10h
+    
+    mov ah,9
+    mov dx,offset User_mes2   ;print message
+    int 21h 
+
+    ReEnterName2:       
+    mov ah,2
+    mov dx,0F16h      ;Set/Move Cursor to Middle postion (incremented row by 1)
+    int 10h 
+    
+    mov ah,0Ah         ;Read user name 2 from keyboard
+    mov dx,offset userName2
+    int 21h   
+    
+    LEA bx,userName2  ;or mov bx,offset userName   
+    
+    ;Validation of First Letter  
+    
+    mov al,[bx]+2 ;because first byte is F->15
+    CMP al,'A';41h ;if Ascii less than A then its a special character
+    JB ReEnterName2  
+        
+    CMP al,'z' ;7Ah
+    JA ReEnterName2  ;if Ascii greater than z then its a special character
+   
+    mov cl, 96   ;move the character just before "a" to cl 
+    sub cl, al    ;do cl=cl-al ===> al contains the first letter of user name,,store the difference in cl,,say N"78" was first letter
+
+    cmp cl, 6       ;if difference in cl is smaller than 6, then invalid
+    JB ReEnterName2        ;special characters from 91d to 96d  
+    
+    ;-------------------------------------------------------
+    mov ah,2
+    mov dx,1016h      ;Set/Move Cursor to Middle postion (increment row by 1)
+    int 10h
+    
+    mov ah,9
+    mov dx,offset Press_mes2   ;print other message
+    int 21h  
+    
+    ;Check for a keystroke
+    EnterLoop:
+        mov ah,0
+        int 16h      ;get key pressed
+        cmp al, 13d  ;Check the key was Enter
+    JNE EnterLoop    ;enter key 0Dh 
+    ret
+AskForUserName endp
+
+PrintMessages proc  
+    ;Printing Middle Messages 
+    mov ah,2          ;set cursor at middle of the screen
+    mov dx,0A16h     ;0C is low so i put 0A                    ;dl=x=16h,dh=y=0Ah
+    int 10h
+    
+    mov ah,9
+    mov dx,offset mes1   ;print mes1
+    int 21h 
+    
+    mov ah,2           ;set cursor at middle of the screen
+    mov dx,0C16h       ;increment row by 2                     ;dl=x=16h,dh=y=0Ch
+    int 10h 
+    
+    mov ah,9
+    mov dx,offset mes2   ;print mes2
+    int 21h
+     
+    mov ah,2             ;set cursor at middle of the screen
+    mov dx,0E16h         ;increment row by 2                  ;dl=x=16h,dh=y=0Eh
+    int 10h
+    
+    mov ah,9
+    mov dx,offset mes3   ;print mes3
+    int 21h  
+     
+    ;Printing Bottom Messages 
+    ; mov ah,2                                                              ;x=coloumn y=row
+    ; mov dx,1801h        ;set cursor at bottom left of the screen      ;dl=x=01h,dh=y=18h
+    ; int 10h
+    
+    ; mov ah,9
+    ; mov dx,offset mes4   ;print mes4
+    ; int 21h 
+       
+    ; mov ah,9
+    ; mov dx,offset userName2+2  ;print username ;+2 because first 2 characters are garbage
+    ; int 21h 
+    
+    ; mov ah,2
+    ; mov dx,1901h        ;set cursor at bottom left of the screen but alittle below 1st one ;dl=x=01h,dh=y=19h
+    ; int 10h
+
+    ; mov ah,9
+    ; mov dx,offset mes5   ;print mes5
+    ; int 21h  
+
+    ; mov ah,9 
+    ; mov dx,offset userName2+2  ;print username ;+2 because first 2 characters are garbage
+    ; int 21h  
+
+    ret
+PrintMessages endp
+
+DrawLine proc
+;Draws bottom line in first screen
+call clearscreen  ;solved the problem of first two messages mixing with second 3 messages
+    MOV BX,0     ;BEC inc,cmp depend on bl value that might change outside this procedure so we need to initialize it with zero always
+    mov ah,2
+    mov dx,1700h          ;dl=x=00h,dh=y=17h
+    int 10h                                 
+    back:                    
+        ;mov ah,2
+        mov dl,'-' 
+        int 21h    ;display character
+        inc BL
+        cmp BL,50h    ;draw minus sign to end of screen 50h=80d
+    jnz back 
+  ret
+DrawLine endp
+
+DrawCenterLine proc
+;draw center line in chatting screen
+;call clearscreen  
+    MOV BX,0
+    mov ah,2
+    mov dx,0C00h          ;dl=x=00h,dh=y=12h
+    int 10h                                 
+    loop1:                    
+        ;mov ah,2
+        mov dl,'-' 
+        int 21h    ;display character
+        inc BL
+        cmp BL,50h    ;draw minus sign to end of screen 50h=80d
+    jnz loop1 
+  ret
+DrawCenterLine endp
+
+DrawBottomLine proc
+;draws bottom line in chatting screen
+;WITHOUT CLEARSCREEN
+    ;print F3 to exit chatting msg first
+    mov ah,2
+    mov dx,1800h      ;Set/Move Cursor at end of screen X=0,Y=18H
+    int 10h 
+
+    mov ah,9
+    mov dx,offset mes6   ;print mes6
+    int 21h  
+    ;draw bottom line
+    MOV BX,0
+    mov ah,2
+    mov dx,1700h          ;dl=x=00h,dh=y=17h
+    int 10h                                 
+    loop2:                    
+        ;mov ah,2
+        mov dl,'-' 
+        int 21h    ;display character
+        inc BL
+        cmp BL,50h    ;draw minus sign to end of screen 50h=80d
+    jnz loop2 
+  ret
+DrawBottomLine endp
+
+PRINTCHATTINGNAMES PROC 
+        mov ah,2
+        mov dx,0101h      ;Set/Move Cursor at X=1,Y=1 TOP LEFT
+        int 10h 
+
+        mov ah,9 
+        mov dx,offset userName1+2  ;print username ;+2 because first 2 characters are garbage
+        int 21h  
+
+        mov BL,LEN_username1  ;11 "nour"
+        SUB BL,5     ;subtraction by trial and error untill i wrote a big name and it was good
+        mov ah,2
+        mov dh,01h     ;Set/Move Cursor at X=bl,Y=01
+        mov dl,BL
+        int 10h 
+
+        mov ah,9 
+        mov dx,offset PRINTCOLON  ;print colon
+        int 21h  
+
+        mov ah,2
+        mov dx,0D01h      ;Set/Move Cursor at X=1,Y=D=13 BELOW CENTER LINE LEFT
+        int 10h 
+
+        mov ah,9 
+        mov dx,offset userName2+2  ;print username ;+2 because first 2 characters are garbage
+        int 21h 
+
+        mov BL,LEN_username2  
+        SUB BL,5     ;subtraction by trial and error untill i wrote a big name and it was good
+        mov ah,2
+        mov dh,0Dh     ;Set/Move Cursor at X=bl,Y=D
+        mov dl,BL
+        int 10h  
+
+        mov ah,9 
+        mov dx,offset PRINTCOLON  ;print colon
+        int 21h  
+    RET
+PRINTCHATTINGNAMES ENDP
+
+INITIALSCREEN proc ;basically changes the upper half color
+	;text mode(80x25)
+	mov ah,0
+	mov al,3
+	int 10h 
+	;scroll upper half the screen	
+	 mov ah,6       ;function 6
+	 mov al,13      ;scroll by 13 lines
+	 mov bh,52      ;video attribute (07)
+	 ;back ground:(0black-1blue-2blue-3green-5lightgreen-6red-7red)
+	 mov ch,0       ;upper left Y
+	 mov cl,0       ;upper left X
+	 mov dh,12      ;lower right Y 
+	 mov dl,79      ;lower right X 
+	 int 10h  
+     ret
+INITIALSCREEN endp
+
+SCROLLCHAT1 PROC
+	;scroll upper half the screen	
+	mov ah,6        ; function 6
+	mov al,1		;scroll one line
+	mov bh,52       ; video attribute
+	mov ch,0        ; upper left Y
+	mov cl,0        ; upper left X
+	mov dh,11       ; lower right Y ;12 beta5od el line m3a7a 
+	mov dl,79       ; lower right X 
+	int 10h  	
+    RET
+SCROLLCHAT1 ENDP
+
+SCROLLCHAT2 PROC
+	;scroll lower half the screen	
+	mov ah,6           ; function 6
+	mov al,1		   ;scroll one line
+	mov bh,07 ;Color   ; video attribute
+	mov ch,13;14 ;13 ;Upy     ; upper left Y
+	mov cl,0  ;Upx     ; upper left X
+	mov dh,22;24 ;21;22 ;Downy   ; lower right Y 
+	mov dl,79 ;Downx   ; lower right X 
+	int 10h  	
+    RET
+SCROLLCHAT2 ENDP
+
+INITIALIZEUART PROC
+    ;Set Divisor Latch Access Bit
+    MOV DX,3FBH       ;Line Control Register
+    MOV AL,10000000b  ;Set Divisor Latch access bit
+    OUT DX,AL         ;Out it
+    ;Set LSB Byte of the Baud Rate Divisor Latch Register ;First Byte
+    MOV DX,3F8H
+    MOV AL,0CH 
+    OUT DX,AL  
+    ;Set MSB Byte of the Baud Rate Divisor Latch Register ;second Byte
+    MOV DX,3F9H
+    MOV AL,00H 
+    OUT DX,AL
+    ;Set Port Configuration
+    MOV DX,3FBH
+    MOV AL,00011011b 
+    OUT DX,AL
+    ;0:Access to recevier buffer, transmitter buffer
+    ;0:Set Break disabled
+    ;011: Even parity
+    ;0:One Stop bit
+    ;11:8 bits
+    RET
+INITIALIZEUART ENDP
+
+;Outer Chat screen=>Sending and receiving
+SENDING PROC
+     ;Check key press and sending key to COM2 to be transfered
+     CHECK_KEYPRESSED: 
+        ;Check hal fe zorar etdas wla la2
+        MOV AH,01   ;Check for key press using INT 16H ,AH=01  ;Get key pressed(do not wait for a key-AH:scancode,AL:ASCII)
+        INT 16H     ;if ZF=1, there is no key press
+        JZ EXITSENDING ;if no key exit this proc         ;if no key go check COM port
+        MOV AH,0    ;yes,there is a key press,get it  ;Get key pressed(wait for a key-AH:scancode,AL:ASCII) AND PUTS IT IN AL
+        INT 16H     ;notice we must use INT 16H twice,2nd time
+        MOV sentCharacter,AL  
+
+        ;Sending a value 
+        AGAIN1:             ;check that transmitter holding register is empty
+            MOV DX,3FDH         ;Line status register 
+            IN AL,DX            ;Read Line status 
+            AND AL,00100000B    ;5th bit is set:You can send data
+            JZ AGAIN1           ;not empty
+        ;if empty put the value in transmit data register
+        MOV DX,3F8H             ;Transmit data register
+        MOV AL,sentCharacter
+        OUT DX,AL               ;A byte is output from AL into the port addressed by DX
+
+        cmp ah,61        ;Check key was F3 to exit chatting
+        JZ RETURNBACK
+        ;cmp al, 27d      ;Check the key was ESC
+        ;JZ ENDPROGRAM
+;-------------------------------------------------------------------
+        cmp ah,1CH ;compare with file seperator, ENTER
+        jne DontScrollLine
+		mov AboveXcursor,-1	    ;We increment it in PrintChar
+		inc AboveYcursor
+
+        cmp AboveYcursor,12      ;if upper screen is full
+		jne DontScrollLine       ;as long as cursor have not reached the center dont scroll
+		;we are here meaning we reached the center so we need to scroll line ,not move to nextline
+        CALL SCROLLCHAT1
+		dec AboveYcursor        ;dec y because everytime it reaches middle of screen we dont want cursor to jump to other half screen below it
+
+		jmp GODISPLAY1 
+	DontScrollLine:
+		;check to remove
+        cmp al,08h     ;backspace ascii code
+		;cmp ah, 0eh 	;delete scan code ;;remove this later============
+		jne GODISPLAY1
+		cmp AboveXcursor,0
+		jne NotInStartX
+		; is in x = 0
+		cmp AboveYcursor,0
+		jne NotInStartY
+		; is in x = 0 && y = 0 ==>then nothing is written
+		ret
+	NotInStartY: ;if they write one character and want to delete it,we move cursor to the 
+                ;most right end of screen then move it up by decrementing the y then add a space
+		; is in x = 0 but y != 0
+		mov AboveXcursor,79
+		dec AboveYcursor
+		mov ah,2
+		mov dl,AboveXcursor
+		mov dh,AboveYcursor
+		int 10h
+		;then print space in place of character
+		mov ah,2
+		mov dl,20h
+		int 21h
+		ret
+	NotInStartX: ;if x!=0
+		dec AboveXcursor       ;let x=5,now x=4
+		mov ah,2
+		mov dl,AboveXcursor
+		mov dh,AboveYcursor   ;Move Cursor to x,y position
+		int 10h
+		;then print space in place of character
+		mov ah, 2
+		mov dl, 20h
+		int 21h
+		ret
+	GODISPLAY1:;display
+		mov bl,Above
+		call PRINTCHARACTER
+    EXITSENDING:
+    RET
+SENDING ENDP
+
+RECEIVING PROC
+    ;in receiving we dont need to check for a keystroke using int16h
+    ;Receiving a value 
+    ;First check that the Data is Ready
+    MOV DX,3FDH      ;Line status register
+    ;CHK: 
+    IN AL,DX      
+    AND AL,1
+    ;JZ CHK 
+    JZ EXITRECEIVING
+    ;if ready read the VALUE in Receive data register
+    MOV DX,03F8H  
+    IN AL,DX 
+    MOV receivedCharacter,AL 
+    ;cmp al, 27d      ;Check the key was ESC
+    ;JZ ENDPROGRAM
+    cmp ah,61         ;check key was F3
+    JZ RETURNBACK
+;---------------------------------------------------------------------------------
+    ;check if key is enter key
+	cmp al,0Dh       ;file seperator 1ch creates a problem of keeping text on same line
+	jne DontScrollLine2
+	mov BelowXcursor,-1	    ;We increment it in PrintChar
+	inc BelowYcursor
+
+	cmp BelowYcursor,17h     ;if screen is full 25
+	jne DontScrollLine2  
+    CALL SCROLLCHAT2
+	dec BelowYcursor
+
+	jmp GODISPLAY2
+	DontScrollLine2:
+	;check to if backspace or delete to remove character(s)
+	cmp al,08h 	          ;Backspace Ascii Code
+	jne GODISPLAY2
+	cmp BelowXcursor,0
+	jne NotInStartX2
+	; is in x = 0
+	cmp BelowYcursor,0
+	jne NotInStartY2
+	; is in x = 0 && y = 0
+	ret
+	NotInStartY2:
+	;in x = 0 but y != 0
+	mov BelowXcursor,79
+	dec BelowYcursor
+	mov ah,2
+	mov dl,BelowXcursor
+	mov dh,BelowYcursor
+	int 10h
+	;print space
+	mov ah,2
+	mov dl,20h
+	int 21h
+	ret
+	NotInStartX2:
+	dec BelowXcursor
+	mov ah,2
+	mov dl,BelowXcursor
+	mov dh,BelowYcursor
+	int 10h
+	;print space
+	mov ah,2
+	mov dl,20h
+	int 21h	
+	ret
+	GODISPLAY2:
+    mov bl,Below
+	call PRINTCHARACTER
+		
+    EXITRECEIVING:
+    RET
+RECEIVING ENDP
+
+PRINTCHARACTER PROC 
+	    cmp bl,Above  ; print up
+        JNE Below_Cursor		
+		
+		cmp AboveXcursor,80     ;end of the line
+		je AboveYcursorLine
+		
+		mov dl,AboveXcursor
+		mov dh,AboveYcursor
+		inc AboveXcursor
+		JMP MoveCursor
+		
+	AboveYcursorLine:           ;is in end of the line,
+        inc AboveYcursor        ;go to the next line
+		cmp AboveYcursor,12     ;if the screen is full ;13
+		jne DonotScrollUp
+        ;if equal then scroll
+        CALL SCROLLCHAT1
+		dec AboveYcursor
+	DonotScrollUp:	
+		mov AboveXcursor,0      ;start from the first column	
+		mov dl,AboveXcursor
+		mov dh,AboveYcursor
+		;for each time we need to set the cursor at the begining of the line at x=0
+		inc AboveXcursor
+		JMP MoveCursor
+	Below_Cursor:
+		cmp BelowXcursor,80     ;end of the line
+		je BelowCursorLine
+		mov dl,BelowXcursor
+		mov dh,BelowYcursor 
+		inc BelowXcursor
+		jmp MoveCursor
+	BelowCursorLine:
+		inc BelowYcursor
+		cmp BelowYcursor,25     ;if screen is full
+		jne DonotScrollDown
+        CALL SCROLLCHAT2
+		sub BelowYcursor,2
+	DonotScrollDown:
+		MOV BelowXcursor,0	
+	    mov dl,BelowXcursor
+		mov dh,BelowYcursor
+		inc BelowXcursor        ;for the upcomming character
+		MoveCursor:
+		mov ah,2 
+		mov bh,0
+		int 10h                 ;move cursor to x,y position
+		;Print the character:
+	    cmp bl,Above    ;print 
+        JNE DownPrint
+		mov dl,sentCharacter
+		jmp PrintLabel		
+	DownPrint:	
+		mov dl,receivedCharacter
+	PrintLabel:	
+		mov ah, 2
+        int 21h 
+    ret
+PRINTCHARACTER ENDP 
+
+;inline Chat =>Send and receive
+SEND PROC
+     ;Check key press and sending key to COM2 to be transfered
+     CHECK_KEYPRESSED1: 
+    ;Check hal fe zorar etdas wla la2
+    MOV AH,01   ;Check for key press using INT 16H ,AH=01  ;Get key pressed(do not wait for a key-AH:scancode,AL:ASCII)
+    INT 16H     ;if ZF=1, there is no key press
+    JZ EXITSEND ;if no key exit this proc         ;if no key go check COM port
+    MOV AH,0    ;yes,there is a key press,get it  ;Get key pressed(wait for a key-AH:scancode,AL:ASCII) AND PUTS IT IN AL
+    INT 16H     ;notice we must use INT 16H twice,2nd time
+    MOV sentCharacter,AL  
+    ;Sending a value 
+    AGAIN2:             ;check that transmitter holding register is empty
+        MOV DX,3FDH         ;Line status register 
+        IN AL,DX            ;Read Line status 
+        AND AL,00100000B    ;5th bit is set:You can send data
+        JZ AGAIN2           ;not empty
+        ;if empty put the value in transmit data register
+        MOV DX,3F8H             ;Transmit data register
+        MOV AL,sentCharacter
+        OUT DX,AL               ;A byte is output from AL into the port addressed by DX
+    EXITSEND:
+    RET
+SEND ENDP   
+
+RECEIVE PROC
+    ;Receiving a value 
+    ;First check that the Data is Ready
+    MOV DX,3FDH      ;Line status register
+    ;CHK: 
+    IN AL,DX      
+    AND AL,1
+    ;JZ CHK 
+    JZ EXITRECEIVE
+    ;if ready read the VALUE in Receive data register
+    MOV DX,03F8H  
+    IN AL,DX 
+    MOV receivedCharacter,AL
+    EXITRECEIVE:
+    RET
+RECEIVE ENDP
+
 
 MAIN PROC FAR
 	MOV AX, @DATA
@@ -1522,10 +2144,40 @@ MAIN PROC FAR
 
 	CALL HIDE_MOUSE
 
+    call clearscreen 
+    call AskForUserName                         
+    RETURNBACK:
+    call clearscreen;call DrawLine
+    call PrintMessages 
+
+      ;;Check for a keystroke
+    OptionLoop:
+        mov ah,0
+        int 16h            ;get key pressed
+        cmp al,27d        ;Check the key was ESC
+        JZ END_PROGRAM      ;ESC key 27d or 1Bh  ;ascii check al
+        cmp ah,59          ;Check the key was F1 (scancode ah)
+        JZ CHATTING  
+        cmp ah,60       ;Check the key was F2 (scancode ah)
+    	JZ StartGame  
+    JNE OptionLoop        
+    
+    CHATTING:
+        ;call clearscreen
+        CALL INITIALSCREEN
+        CALL INITIALIZEUART
+        CALL DrawCenterLine
+        CALL DrawBottomLine
+        CALL PRINTCHATTINGNAMES
+        AGAIN: 
+            CALL SENDING
+            CALL RECEIVING   
+        JMP AGAIN
+
+StartGame:
 	CALL GAME_DESC
 
 	CALL CHOOSE_LEVEL
-
 
 	CALL CHANGE_TO_VIDEO
 
@@ -1576,7 +2228,9 @@ MAIN PROC FAR
 	DRAW_COIN 527, 331
 	DRAW_COIN 607, 159
 
-
+    ;cmp al, 27d        ;Check the key was ESC
+    ;JZ END_PROGRAM      ;ESC key 27d or 1Bh  ;ascii check al
+        
 
 ; Infinite loop that lets the user move players all around the grid
 	INFINITE:
@@ -1970,8 +2624,7 @@ END_GAME:
 
 
 END_PROGRAM:
-HLT
+MOV AH,04CH
+INT 21H     ;EXIT TO DOS
 MAIN ENDP
 END MAIN
-
-

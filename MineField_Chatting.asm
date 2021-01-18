@@ -32,12 +32,30 @@ BelowXcursor db 0
 BelowYcursor db 14
 Below equ 2
 BelowColor equ 07
-   
+
+inGamesentCharacter db '$'
+LeftXcursor db 4 ;5
+LeftYcursor db 24
+left equ 1
+;AboveColor equ 52
+inGamereceivedCharacter db '$'
+RightXcursor db 49
+RightYcursor db 24
+Right equ 2
+;BelowColor equ 07
+boolean db 0
+
+gotInvitedToGame db 0
+gotInvitedToChat  db 0
+
 SCORE_MSG 	DB ':Score:'
 ; Score, Number of digits, Score as a string
 SCORE_P1 	DW 0, ?, ?
 SCORE_P2 	DW 0, ?, ?
 MAX_SCORE 	EQU 100
+
+PLAYER_ONE_WORD  DB 'P: '
+PLAYER_TWO_WORD  DB 'P: '
 
 STATUS_PURPLE 		DB 'Choose a Box (Y / G / B)'
 STATUS_PURPLE_LEN	EQU	24
@@ -52,18 +70,18 @@ LVL1_MSG DB '* Press F1 for Level 1'
 LVL2_MSG DB '* Press F2 for Level 2'
 ERROR_MSG DB 'ERROR: you entered a wrong key, please Re-enter F1 or F2:'
 
-GAME_DESCRIPTION DB '  Here are some instructions for you:',10,13,10,13 ;,?
-                DB '  1. The Left player move it using (w, s, a, d)',10,13
-                DB '  while the right one move it by the ordinary arrows.',10,13,10,13
-                DB '  2. The coins are always good for you.',10,13,10,13
-                DB '  3. Take care about boxes:',10,13,10,13,'  - Red box:',9,'  Make your score 0 (Be careful).',10,13
-                DB '  - Green box:',9,'Decrease your enemy score by 20.',10,13,'  - Yellow box:',9,'increment your score by 15.' ,10,13
-                DB '  - Blue box:',9,'Remove the red boxes (bombs) from the grid.',10,13,'  - Purple box:',9,'Let you choose one of the previous feature.',10,13
-                DB '  - White box:',9,'Put a bomb (Red box) near your enemy.',10,13,'  - Aqua box:',9,'Remove all objects (boxes and coins) around the other player',10,13,10,13
-                DB '  4. You won when your score reaches 100.',10,13,10,13,10,13
-                DB '  Press Any Key To Continue...$'
+GAME_DESCRIPTION DB 'Here some instructions for you:',10,13,10,13 ;,?
+                DB '1. The Left player move it using (w, s, a, d)',10,13
+                DB 'while the right one move it by the ordinary arrows.',10,13,10,13
+                DB '2. The coins are always good for you.',10,13,10,13
+                DB '3. Take care about boxes:',10,13,10,13,'- Red box:',9,'Make your score 0 (Be careful).',10,13
+                DB '- Green box:',9,'Decrease your enemy score by 20.',10,13,'- Yellow box:',9,'increment your score by 15.' ,10,13
+                DB '- Blue box:',9,'Remove the red boxes (bombs) from the grid.',10,13,'- Purple box:',9,'Let you choose one of the previous feature.',10,13
+                DB'- White box:',9,'Put a bomb (Red box) near your enemy.',10,13,'- Aqua box:',9,'Remove all objects (boxes and coins) around the other player',10,13,10,13
+                DB '4. You won when your score reaches 100.',10,13,10,13,10,13
+                DB 'Press Any Key To Continue...$'
 
-
+IS_CHAT DB 0
 ; Meo.bmp data
 IMG_WID EQU 32
 IMG_HEIGHT EQU 32
@@ -186,6 +204,10 @@ Y_RAND_BOX  DW ?
 X_RAND_COIN DW ?
 Y_RAND_COIN DW ?
 
+ARR_CHK DB ?
+ARROWS DB ?
+
+PLR_FLAG DB ?
 
 .CODE
 
@@ -219,23 +241,17 @@ DRAW_GRID PROC
 	MOV DX, 0 ;Starting jth position 
 	INT 10H
 
-
-						
-
 	FirstLineoftheSquare:
 	INT 10H
 	INC CX
 	CMP CX, 639 
 	JNZ FirstLineoftheSquare   
 
-
-	
 	SecondLineoftheSquare:
 	INT 10H
 	INC DX
 	CMP DX, 343
 	JNZ SecondLineoftheSquare 
-
 
 	ThirdLineoftheSquare:
 	INT 10H
@@ -268,7 +284,6 @@ DRAW_GRID PROC
 	cmp dx, 344
 	jnz vltwo
 
-
 	mov cx, 240
 	mov dx, 0
 	;mov bx, 344
@@ -286,7 +301,6 @@ DRAW_GRID PROC
 	cmp dx, 344
 	jnz vlfour      
 
-
 	mov cx, 400
 	mov dx, 0
 	;mov bx, 344
@@ -295,7 +309,6 @@ DRAW_GRID PROC
 	inc dx
 	cmp dx, 344
 	jnz vlfive
-
 
 	mov cx, 480
 	mov dx, 0
@@ -315,7 +328,6 @@ DRAW_GRID PROC
 	cmp dx, 344
 	jnz vlseven  
 
-
 	mov cx, 640
 	mov dx, 0
 	;mov bx, 344
@@ -325,19 +337,14 @@ DRAW_GRID PROC
 	cmp dx, 344
 	jnz vleight   
 
-
-
-
 	mov cx, 0
 	mov dx, 43
-
 
 	hlone:
 	INT 10H
 	INC CX
 	CMP CX, 639
 	JNZ hlone
-
 
 	mov cx, 0
 	mov dx, 86
@@ -348,7 +355,6 @@ DRAW_GRID PROC
 	INC CX
 	CMP CX, 639
 	JNZ hltwo
-
 
 	mov cx, 0
 	mov dx, 129
@@ -370,7 +376,6 @@ DRAW_GRID PROC
 	CMP CX, 639
 	JNZ hlfour
 
-
 	mov cx, 0
 	mov dx, 215
 
@@ -390,7 +395,6 @@ DRAW_GRID PROC
 	INC CX
 	CMP CX, 639
 	JNZ hlsix
-
 
 	mov cx, 0
 	mov dx, 301
@@ -946,7 +950,7 @@ DISPLAY_STATUS MACRO X, Y, LEN, MSG
     MOV CX,LEN 						;Length of the string to be printed 
     MOV DH,Y 						;Y coordinate
     MOV DL,X 						;X coordinate
-    MOV BP,OFFSET MSG 		;Moves to bp the offset of the string
+    MOV BP,OFFSET MSG 		        ;Moves to bp the offset of the string
     INT 10H
 ENDM DISPLAY_STATUS
 
@@ -956,7 +960,7 @@ CLEAR_STATUS MACRO X, Y, LEN, MSG
     MOV CX,LEN 						;Length of the string to be printed 
     MOV DH,Y 						;Y coordinate
     MOV DL,X 						;X coordinate
-    MOV BP,OFFSET MSG 		;Moves to bp the offset of the string
+    MOV BP,OFFSET MSG 		        ;Moves to bp the offset of the string
     INT 10H
 ENDM CLEAR_STATUS
 
@@ -964,6 +968,17 @@ DISPLAY_WORD_SCORE PROC
     DISPLAY_STATUS 35, 22, 7, SCORE_MSG
     RET
 DISPLAY_WORD_SCORE ENDP 
+
+DISPLAY_P2_TO_CHAT PROC
+DISPLAY_STATUS 0,24,3,PLAYER_TWO_WORD
+RET
+DISPLAY_P2_TO_CHAT ENDP
+
+DISPLAY_P1_TO_CHAT PROC
+DISPLAY_STATUS 45,24,3,PLAYER_ONE_WORD
+RET
+DISPLAY_P1_TO_CHAT ENDP
+
 
 RED_BOX_EFFECT MACRO X, Y
 LOCAL TERMINATE, Calc_2
@@ -1488,6 +1503,7 @@ DISPLAY_SCORE_P1 ENDP
 
 DISPLAY_SCORE_P2 PROC
 	CONVERT_TO_ASCII SCORE_P2
+	
 	MOV AX, 1300H
 	Mov cx, 2
 	MOV BH,0 				; Page number = zero (always)
@@ -2136,6 +2152,301 @@ RECEIVE PROC
     RET
 RECEIVE ENDP
 
+CLEARMSG1 PROC
+	;scroll upper half the screen	
+	mov ah,6        ; function 6
+	mov al,1		;scroll one line
+	mov bh,52       ; video attribute
+	mov ch,24;0        ; upper left Y
+	mov cl,4;0        ; upper left X
+	mov dh,24;11       ; lower right Y  
+	mov dl,32;79       ; lower right X 
+	int 10h  	
+    RET
+CLEARMSG1 ENDP
+
+INGAMESENDING PROC
+     ;Check key press and sending key to COM2 to be transfered
+     CHECK_KEYPRESSED11: 
+        ;Check hal fe zorar etdas wla la2
+        MOV AH,01   ;Check for key press using INT 16H ,AH=01  ;Get key pressed(do not wait for a key-AH:scancode,AL:ASCII)
+        INT 16H     ;if ZF=1, there is no key press
+        JZ EXITINGAMESENDING ;if no key exit this proc         ;if no key go check COM port
+        MOV AH,0    ;yes,there is a key press,get it  ;Get key pressed(wait for a key-AH:scancode,AL:ASCII) AND PUTS IT IN AL
+        INT 16H     ;notice we must use INT 16H twice,2nd time
+        MOV inGamesentCharacter,AL  
+
+        ;Sending a value 
+        AGAIN11:             ;check that transmitter holding register is empty
+            MOV DX,3FDH         ;Line status register 
+            IN AL,DX            ;Read Line status 
+            AND AL,00100000B    ;5th bit is set:You can send data
+            JZ AGAIN11          ;not empty
+        ;if empty put the value in transmit data register
+        MOV DX,3F8H             ;Transmit data register
+        MOV AL,inGamesentCharacter
+        OUT DX,AL               ;A byte is output from AL into the port addressed by DX
+
+        ;;;;;;;;;; ah,61        ;Check key was F3 to exit chatting
+        ;;;;;;;;;;JZ RETURNBACK
+        ;cmp al, 27d      ;Check the key was ESC
+        ;JZ ENDPROGRAM
+;-------------------------------------------------------------------
+        ;;;cmp ah,0DH;1CH; ;compare with file seperator, ENTER
+        ;;;jne DontScrollLine1
+		;if enter
+		;;;mov LeftXcursor,5;4;-1	    ;We increment it in PrintChar
+		;inc LeftYcursor
+		;jmp NotInStartX1 
+		;;;CALL CLEARMSG1;
+		;;;dec LeftYcursor
+		;;;jmp GODISPLAY11
+        ;cmp LeftYcursor,24      ;if left screen is full
+		;cmp LeftXcursor,32
+		;jne DontScrollLine1     ;as long as cursor have not reached the center dont scroll
+		;we are here meaning we reached the center so we need to scroll line ,not move to nextline
+        ;CALL SCROLLCHAT1
+		;dec LeftYcursor        ;dec y because everytime it reaches middle of screen we dont want cursor to jump to other half screen below it
+
+		;jmp GODISPLAY11
+
+		;if no enter is pressed
+	DontScrollLine1:
+		;check to remove
+        cmp al,08h     ;backspace ascii code
+		;cmp ah,0eh 	;delete scan code ;;remove this later============
+		jne GODISPLAY11
+		;if backspace key  :to delete
+		;cmp LeftXcursor,0
+		cmp LeftXcursor,4
+		jne NotInStartX1
+		;if cursor at 4
+		jne GODISPLAY11
+		; is in x = 0
+		;cmp LeftYcursor,0
+		;jne NotInStartY1
+		; is in x = 0 && y = 0 ==>then nothing is written
+		ret
+	; NotInStartY1: ;if they write one character and want to delete it,we move cursor to the 
+    ;             ;most right end of screen then move it up by decrementing the y then add a space
+	; 	; is in x = 0 but y != 0
+	; 	mov LeftXcursor,32
+	; 	dec LeftYcursor
+	; 	mov ah,2
+	; 	mov dl,LeftXcursor
+	; 	mov dh,LeftYcursor
+	; 	int 10h
+	; 	;then print space in place of character
+	; 	mov ah,2
+	; 	mov dl,20h
+	; 	int 21h
+	; 	ret
+	NotInStartX1: ;if x!=4
+		dec LeftXcursor       ;let x=5,now x=4
+		mov ah,2
+		mov dl,LeftXcursor
+		mov dh,LeftYcursor   ;Move Cursor to x,y position
+		int 10h
+		;then print space in place of character
+		mov ah, 2
+		mov dl, 20h
+		int 21h
+		ret
+
+	; cmp ah,0DH;1CH; ;compare with file seperator, ENTER
+    ; ;jne DontScrollLine1
+	; 	;if enter
+	; mov LeftXcursor,5;4;-1	    ;We increment it in PrintChar
+	; 	;inc LeftYcursor
+	; 	;jmp NotInStartX1 
+	; mov ah,2
+	; mov dl,LeftXcursor
+	; mov dh,LeftYcursor   ;Move Cursor to x,y position
+	; int 10h
+	; ;then print space in place of character
+	; mov ah, 2
+	; mov dl, 20h
+	; int 21h
+	; ret
+	; CALL CLEARMSG1;
+	; dec LeftYcursor
+	;jmp GODISPLAY11
+
+	GODISPLAY11:;display
+		mov bl,left
+		call INGAMEPRINTCHARACTER
+    EXITINGAMESENDING:
+    RET
+INGAMESENDING ENDP
+
+INGAMERECEIVING PROC
+    ;in receiving we dont need to check for a keystroke using int16h
+    ;Receiving a value 
+    ;First check that the Data is Ready
+    MOV DX,3FDH      ;Line status register
+    ;CHK: 
+    IN AL,DX      
+    AND AL,1
+    ;JZ CHK 
+    JZ EXITINGAMERECEIVING
+    ;if ready read the VALUE in Receive data register
+    MOV DX,03F8H  
+    IN AL,DX 
+    MOV inGamereceivedCharacter,AL 
+    ;cmp al, 27d      ;Check the key was ESC
+    ;JZ ENDPROGRAM
+
+    ;;;;;;;;;;;;cmp ah,60     ;f2    ;check key was F3 61
+	;mov boolean,1
+    ;;;;;;;;;;;;;JZ RETURNBACK
+;---------------------------------------------------------------------------------
+    ;check if key is enter key
+	cmp al,0Dh       ;file seperator 1ch creates a problem of keeping text on same line
+	jne DontScrollLine22
+	mov RightXcursor,48;-1	    ;We increment it in PrintChar
+	;inc RightYcursor
+	jmp NotInStartX22
+	;cmp RightYcursor,24     ;if screen is full 25
+	; DontScrollLine22  
+    ;CALL SCROLLCHAT2
+	;dec RightYcursor
+
+	;jmp GODISPLAY2
+	DontScrollLine22:
+	;check to if backspace or delete to remove character(s)
+	cmp al,08h 	          ;Backspace Ascii Code
+	jne GODISPLAY22
+	;cmp RightXcursor,0
+	cmp RightXcursor,49 ;instart of right
+	jne NotInStartX22
+	;;;;;;;;;;;;;;;; is in x = 0======remove
+	; is in x=49
+	;cmp RightYcursor,0
+	;jne NotInStartY22
+	;;;;;;;;;;;;is in x = 0 && y = 0
+	ret
+	; NotInStartY22:
+	; ;in x = 0 but y != 0
+	; mov RightXcursor,60
+	; dec RightYcursor
+	; mov ah,2
+	; mov dl,RightXcursor
+	; mov dh,RightYcursor
+	; int 10h
+	; ;print space
+	; mov ah,2
+	; mov dl,20h
+	; int 21h
+	; ret
+	NotInStartX22:
+	;in x!=0 but y=24
+	dec RightXcursor
+	mov ah,2
+	mov dl,RightXcursor
+	mov dh,RightYcursor
+	int 10h
+	;print space
+	mov ah,2
+	mov dl,20h
+	int 21h	
+	ret
+	GODISPLAY22:
+    mov bl,Right
+	call INGAMEPRINTCHARACTER
+		
+    EXITINGAMERECEIVING:
+    RET
+INGAMERECEIVING ENDP
+
+
+INGAMEPRINTCHARACTER PROC 
+	    cmp bl,left  ; print
+        JNE Below_Cursor1		
+		
+		cmp LeftXcursor,30;80     ;end of the line
+		;je AboveYcursorLine1
+		;je PrintLabel1
+		JE EXITINGAMEPRINTCHARACTER
+		
+		;if x is not at 32
+		mov dl,LeftXcursor
+		mov dh,LeftYcursor
+		inc LeftXcursor
+		JMP MoveCursor1
+		
+	; AboveYcursorLine1:           ;is in end of the line,
+    ;     ;inc LeftYcursor        ;go to the next line
+	; 	cmp LeftYcursor,12     ;if the screen is full ;13
+	; 	jne DonotScrollUp1
+    ;     ;if equal then scroll
+    ;     ;CALL SCROLLCHAT1
+	; 	dec LeftYcursor
+	DonotScrollUp1:	;;;;;;;;;;;;;
+		mov LeftXcursor,4      ;start from the first ;column	
+		mov dl,LeftXcursor
+		mov dh,LeftYcursor
+		;for each time we need to set the cursor at the begining of the line at x=0
+		inc LeftXcursor
+		JMP MoveCursor1
+	Below_Cursor1:
+		cmp RightXcursor,75     ;end of the line
+		;je BelowCursorLine1
+		;je DownPrint1
+		je EXITINGAMEPRINTCHARACTER
+		
+		mov dl,RightXcursor
+		mov dh,RightYcursor 
+		inc RightXcursor
+		jmp MoveCursor1
+	
+	; BelowCursorLine1:
+	; 	inc RightYcursor
+	; 	cmp RightYcursor,25     ;if screen is full
+	; 	jne DonotScrollDown1
+    ;     ;CALL SCROLLCHAT2
+	; 	sub RightYcursor,2
+	
+	DonotScrollDown1:
+		MOV RightXcursor,49;0	
+	    mov dl,RightXcursor
+		mov dh,RightYcursor
+		inc RightXcursor        ;for the upcomming character
+		MoveCursor1:
+		mov ah,2 
+		mov bh,0
+		int 10h                 ;move cursor to x,y position
+		;Print the character:
+	    cmp bl,left    ;print 
+        JNE DownPrint1
+		mov dl,inGamesentCharacter
+		jmp PrintLabel1		
+	DownPrint1:	
+		mov dl,inGamereceivedCharacter
+	PrintLabel1:	
+		mov ah,2
+        int 21h 
+EXITINGAMEPRINTCHARACTER:
+    ret
+INGAMEPRINTCHARACTER ENDP 
+
+; SEND_ARROWS MACRO  TMP
+; 	mov dx , 3F8H
+; 	mov aL, BYTE PTR TMP
+; 	out dx , aL
+; ENDM SEND_ARROWS
+
+; RECEIVE_ARROWS MACRO TMP
+; LOCAL CHK
+; 	mov dx , 3FDH
+; 	CHK:
+; 	in al , dx
+; 	AND al , 1
+; 	JZ CHK
+
+; 	mov dx , 03F8H
+; 	in aL , dx
+; 	mov TMP, BYTE PTR aL
+; ENDM RECEIVE_ARROWS
 
 MAIN PROC FAR
 	MOV AX, @DATA
@@ -2174,7 +2485,22 @@ MAIN PROC FAR
             CALL RECEIVING   
         JMP AGAIN
 
+; checkinf: 
+; ;Check hal fe zorar etdas wla la2
+; MOV AH,01   ;Check for key press using INT 16H ,AH=01  ;Get key pressed(do not wait for a key-AH:scancode,AL:ASCII)
+; INT 16H     ;if ZF=1, there is no key press
+; ;cmp ah,60 ;F2
+; ;JZ  StartGame;if no key exit this proc         
+; MOV AH,0    ;yes,there is a key press,get it  ;Get key pressed(wait for a key-AH:scancode,AL:ASCII) AND PUTS IT IN AL
+; INT 16H     ;notice we must use INT 16H twice,2nd time
+; cmp ah,60 ;F2
+; JZ  StartGame;if no key exit this proc         
+; ;cmp ah,61 ;F3
+; ;JZ  INGAMECHATTING
+; jmp checkinf
+
 StartGame:
+
 	CALL GAME_DESC
 
 	CALL CHOOSE_LEVEL
@@ -2184,6 +2510,10 @@ StartGame:
 	CALL DRAW_GRID
 
 	CALL DISPLAY_WORD_SCORE
+
+    CALL DISPLAY_P2_TO_CHAT
+    CALL DISPLAY_P1_TO_CHAT
+
 
 	DRAW_PLAYER PLAYER_IMG, X_POS, Y_POS
 	DRAW_PLAYER PLAYER_IMG2, X_POS2, Y_POS2
@@ -2230,13 +2560,48 @@ StartGame:
 
     ;cmp al, 27d        ;Check the key was ESC
     ;JZ END_PROGRAM      ;ESC key 27d or 1Bh  ;ascii check al
-        
+
+	
 
 ; Infinite loop that lets the user move players all around the grid
 	INFINITE:
+		
+
+
+		;MOV AH, 1			
+		;INT 16H	
+   		;cmp ah,60 ;F2
+		;JE  StartGame   
+
+		CMP IS_CHAT, 0
+		JE INF1
+		CMP IS_CHAT, 1
+		JE INGAMECHATTING
+		JMP INFINITE
+
+		INGAMECHATTING:
+			CALL INITIALIZEUART
+    	AGAINN: 
+        	CALL INGAMESENDING
+       		CALL INGAMERECEIVING  
+			MOV AH,01   
+			INT 16H
+			JZ AGAINN     
+			;cmp ah,60 ;F2
+			;JZ  StartGame;if no key exit this proc         
+			MOV AH,0   
+			INT 16H  
+			cmp ah,61        ;Check key was F3 to exit In game chatting
+       		JZ GAME
+			JMP AGAINN
+			GAME:
+			MOV IS_CHAT, 0
+
+		INF1:
+
+	
 		CALL DISPLAY_SCORE_P1
 		CALL DISPLAY_SCORE_P2
-
 	; Check one of the players reaches score 100 to end the game
 		CMP SCORE_P1, 100
 		JGE END_GAME
@@ -2246,11 +2611,47 @@ StartGame:
 	; Check if the a key is pressed
 		MOV AH, 1			
 		INT 16H				; Gets a key in the keyboard buffer
-	JZ INFINITE
 
+		JZ INFINITE;if no key pressed
+;-------------------------------------------------------------------------
+		;cmp ah,61        ;Check key was F3 to enter chatting
+        ;JZ INGAMECHATTING
+;-------------------------------------------------------------------------
+
+; checkinf: 
+; ;Check hal fe zorar etdas wla la2
+; MOV AH,01   ;Check for key press using INT 16H ,AH=01  ;Get key pressed(do not wait for a key-AH:scancode,AL:ASCII)
+; INT 16H     ;if ZF=1, there is no key press
+; ;cmp ah,60 ;F2
+; ;JZ  StartGame;if no key exit this proc         
+; MOV AH,0    ;yes,there is a key press,get it  ;Get key pressed(wait for a key-AH:scancode,AL:ASCII) AND PUTS IT IN AL
+; INT 16H     ;notice we must use INT 16H twice,2nd time
+; cmp ah,60 ;F2
+; JZ  inf2;if no key exit this proc         
+; ;cmp ah,61 ;F3
+; ;JZ  INGAMECHATTING
+
+; jmp checkinf
+
+	;inf2:
+		;MOV AH, 1			
+		;INT 16H	
+	
+;-----------------------------------------------------------------------------------------------------------------
 		MOV AH, 0		
 		INT 16H				; Gets what's inside the buffer to AH
 
+		cmp ah,60   ;F2
+		JZ  CHATT	        
+		cmp ah,61 	;F3
+		JZ  INF2
+		JMP INF2
+
+		CHATT:
+		MOV IS_CHAT, 1
+		JMP INFINITE
+
+		inf2:
 		CMP AH, 48H
 		JE UP_ARROW
 		CMP AH, 4BH
@@ -2272,6 +2673,12 @@ StartGame:
 ; First Player
 
 		UP_ARROW:
+			; MOV ARROWS, 1
+			; SEND_ARROWS ARROWS
+			; RECEIVE_ARROWS ARROWS
+			; CMP ARR_CHK, 1
+			; JNE INFINITE
+
 		; Checks if it reaches the top border
 			MOV DX, IMG_HEIGHT
 			ADD DX, 10
@@ -2318,6 +2725,12 @@ StartGame:
 		JMP INFINITE
 
 		LEFT_ARROW:
+			; MOV ARROWS, 2
+			; SEND_ARROWS ARROWS
+			; RECEIVE_ARROWS ARROWS
+			; CMP ARR_CHK, 2
+			; JNE INFINITE
+
 			MOV DX, IMG_WID
 			ADD DX, 40
 			CMP X_POS, DX
@@ -2358,6 +2771,12 @@ StartGame:
 		JMP INFINITE
 
 		RIGHT_ARROW:
+			; MOV ARROWS, 3
+			; SEND_ARROWS ARROWS
+			; RECEIVE_ARROWS ARROWS
+			; CMP ARR_CHK, 3
+			; JNE INFINITE
+
 			CMP X_POS, 600		; Depends on the video mode and screen dim
 			JGE INFINITE
 
@@ -2397,6 +2816,12 @@ StartGame:
 		JMP INFINITE
 
 		DOWN_ARROW:
+			; MOV ARROWS, 4
+			; SEND_ARROWS ARROWS
+			; RECEIVE_ARROWS ARROWS
+			; CMP ARR_CHK, 4
+			; JNE INFINITE
+
 			CMP Y_POS, 300		; Depends on the video mode and screen dim
 			JGE INFINITE
 
@@ -2596,7 +3021,15 @@ StartGame:
 			DRAW_RAND_BOX 11
 
 	JMP INFINITE
-	
+
+	; INGAMECHATTING:
+	; CALL INITIALIZEUART
+    ; AGAINN: 
+    ;     CALL INGAMESENDING
+    ;     CALL INGAMERECEIVING  
+	; 	cmp ah,61        ;Check key was F3 to exit In game chatting
+    ;     JZ INFINITE 
+    ; JMP AGAINN 
 
 END_GAME:
 

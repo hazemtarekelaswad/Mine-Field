@@ -44,7 +44,6 @@ GAME_DESCRIPTION DB '  Here are some instructions for you:',10,13,10,13 ;,?
                 DB '  4. You won when your score reaches 100.',10,13,10,13,10,13
                 DB '  Press Any Key To Continue...$'
 
-
 ; Meo.bmp data
 IMG_WID EQU 32
 IMG_HEIGHT EQU 32
@@ -1792,15 +1791,6 @@ MAIN PROC FAR
 			CMP Y_POS, DX
 			JLE INFINITE 
 
-		; Checks if the other player located in the above cell
-			; MOV DX, Y_POS
-			; SUB DX, IMG_HEIGHT
-			; SUB DX, 11
-			; MOV TEMP_Y, DX
-			; STORE_IMG_32 x_pos, temp_y; X_POS, TEMP_Y
-			; COMPARE_OBJS TEMP_IMG_32, PLAYER_IMG2, 1024
-			; JE SKIP1
-
 		; Lets the player move by STEPY 
 			CLEAR_PLAYER X_POS, Y_POS
 			MOV DX, STEPY
@@ -1837,14 +1827,6 @@ MAIN PROC FAR
 			CMP X_POS, DX
 			JLE INFINITE
 
-			; MOV CX, X_POS
-			; SUB CX, IMG_WID
-			; SUB CX, 48
-			; MOV TEMP_X, CX
-			; STORE_IMG_32 Y_POS, TEMP_X
-			; COMPARE_OBJS TEMP_IMG_32, PLAYER_IMG2, 1024
-			; JE SKIP2
-
 			CLEAR_PLAYER X_POS, Y_POS
 			MOV DX, STEPX
 			SUB X_POS, DX
@@ -1874,14 +1856,6 @@ MAIN PROC FAR
 		RIGHT_ARROW:
 			CMP X_POS, 600		; Depends on the video mode and screen dim
 			JGE INFINITE
-
-			; MOV CX, X_POS
-			; ADD CX, IMG_WID
-			; ADD CX, 48
-			; MOV TEMP_X, CX
-			; STORE_IMG_32 TEMP_X, Y_POS
-			; COMPARE_OBJS TEMP_IMG_32, PLAYER_IMG, 1024
-			; JE SKIP3
 
 			CLEAR_PLAYER X_POS, Y_POS
 			MOV DX, STEPX
@@ -1913,14 +1887,6 @@ MAIN PROC FAR
 		DOWN_ARROW:
 			CMP Y_POS, 300		; Depends on the video mode and screen dim
 			JGE INFINITE
-
-			; MOV DX, Y_POS
-			; ADD DX, IMG_HEIGHT
-			; ADD DX, 11
-			; MOV TEMP_Y, DX
-			; STORE_IMG_32 X_POS, TEMP_Y
-			; COMPARE_OBJS TEMP_IMG_32, PLAYER_IMG2, 1024
-			; JE SKIP4
 
 			CLEAR_PLAYER X_POS, Y_POS
 			MOV DX, STEPY
@@ -1956,14 +1922,6 @@ MAIN PROC FAR
 			ADD DX, 10
 			CMP Y_POS2, DX
 			JLE INFINITE
-
-			; MOV DX, Y_POS2
-			; SUB DX, IMG_HEIGHT
-			; SUB DX, 11
-			; MOV TEMP_Y, DX
-			; STORE_IMG_32 X_POS2, TEMP_Y
-			; COMPARE_OBJS TEMP_IMG_32, PLAYER_IMG, 1024
-			; JE SKIP5
 			
 			CLEAR_PLAYER X_POS2, Y_POS2
 			MOV DX, STEPY2
@@ -1998,14 +1956,6 @@ MAIN PROC FAR
 			CMP X_POS2, DX
 			JLE INFINITE
 
-			; MOV CX, X_POS2
-			; SUB CX, IMG_WID
-			; SUB CX, 48
-			; MOV TEMP_X, CX
-			; STORE_IMG_32 TEMP_X, Y_POS2
-			; COMPARE_OBJS TEMP_IMG_32, PLAYER_IMG, 1024
-			; JE SKIP6
-
 			CLEAR_PLAYER X_POS2, Y_POS2
 			MOV DX, STEPX2
 			SUB X_POS2, DX
@@ -2035,14 +1985,6 @@ MAIN PROC FAR
 		D_KEY:
 			CMP X_POS2, 600		; Depends on the video mode and screen dim
 			JGE INFINITE
-
-			; MOV CX, X_POS2
-			; ADD CX, IMG_WID
-			; ADD CX, 48
-			; MOV TEMP_X, CX
-			; STORE_IMG_32 TEMP_X, Y_POS2
-			; COMPARE_OBJS TEMP_IMG_32, PLAYER_IMG, 1024
-			; JE SKIP7
 
 			CLEAR_PLAYER X_POS2, Y_POS2
 			MOV DX, STEPX2
@@ -2076,14 +2018,6 @@ MAIN PROC FAR
 		S_KEY:
 			CMP Y_POS2, 300		; Depends on the video mode and screen dim
 			JGE INFINITE
-
-			; MOV DX, Y_POS2
-			; ADD DX, IMG_HEIGHT
-			; ADD DX, 11
-			; MOV TEMP_Y, DX
-			; STORE_IMG_32 X_POS2, TEMP_Y
-			; COMPARE_OBJS TEMP_IMG_32, PLAYER_IMG, 1024
-			; JE SKIP8
 
 			CLEAR_PLAYER X_POS2, Y_POS2
 			MOV DX, STEPY2

@@ -4,15 +4,15 @@
 .DATA 
 ;main menu messages must be at the beginning!!!!!
 ;1st screen output messages     ;13,10,;13 carriage etrurn ,10 line feed
-User_mes1 db "Please enter your Name: ",'$'         
-Press_mes2 db "Press Enter key to continue",'$'
-userName1 db 15,?, 15 dup('$') 
-User_mes2 db "Please enter 2nd player Name: ",'$' 
-userName2 db 15,?, 15 dup('$')   
+User_mes1 DB "Please enter your Name: ",'$'         
+Press_mes2 DB "Press Enter key to continue",'$'
+userName1 DB 15,?, 15 dup('$') 
+User_mes2 DB "Please enter 2nd player Name: ",'$' 
+userName2 DB 15,?, 15 dup('$')   
 ;2nd screen output messages 
-mes1 db "Choose one of the following: ",'$'         
-mes2 db "*To start MineField game press F2",'$' 
-mes3 db "*To end the program press ESC",10,13,'$'
+mes1 DB "Choose one of the following: ",'$'         
+mes2 DB "*To start MineField game press F2",'$' 
+mes3 DB "*To end the program press ESC",10,13,'$'
 
 SCORE_MSG 	DB ':Score:'
 ; Score, Number of digits, Score as a string
@@ -190,160 +190,160 @@ Y_RAND_COIN DW ?
 ;    	F2                         	3C     
 ;		Space                      	39             
 
-clearscreen proc
-  mov ah,0
-  mov al,3
-  int 10H 
-  ret
-clearscreen endp
+clearscreen PROC
+  MOV ah,0
+  MOV al,3
+  INT 10H 
+  RET
+clearscreen ENDP
 
-PrintMessages proc  
+PrintMessages PROC  
 	;CALL clearscreen
     ;Printing Middle Messages 
-    mov ah,2          ;set cursor at middle of the screen
-    mov dx,0A16h     ;0C is low so i put 0A                    ;dl=x=16h,dh=y=0Ah
-    int 10h
+    MOV ah,2          ;set cursor at middle of the screen
+    MOV DX,0A16h     ;0C is low so i put 0A                    ;DL=x=16h,dh=y=0Ah
+    INT 10h
     
-    mov ah,9
-    mov dx,offset mes1   ;print mes1
-    int 21h 
+    MOV ah,9
+    MOV DX,OFFSET mes1   ;print mes1
+    INT 21h 
     
-    mov ah,2           ;set cursor at middle of the sMahmsmscreen
-    mov dx,0C16h       ;increment row by 2                     ;dl=x=16h,dh=y=0Ch
-    int 10h 
+    MOV ah,2           ;set cursor at middle of the sMahmsmscreen
+    MOV DX,0C16h       ;increment row by 2                     ;DL=x=16h,dh=y=0Ch
+    INT 10h 
     
-    mov ah,9
-    mov dx,offset mes2   ;print mes2
-    int 21h
+    MOV ah,9
+    MOV DX,OFFSET mes2   ;print mes2
+    INT 21h
      
-    mov ah,2             ;set cursor at middle of the screen
-    mov dx,0E16h         ;increment row by 2                  ;dl=x=16h,dh=y=0Eh
-    int 10h
+    MOV ah,2             ;set cursor at middle of the screen
+    MOV DX,0E16h         ;increment row by 2                  ;DL=x=16h,dh=y=0Eh
+    INT 10h
     
-    mov ah,9
-    mov dx,offset mes3   ;print mes3
-    int 21h  
+    MOV ah,9
+    MOV DX,OFFSET mes3   ;print mes3
+    INT 21h  
      
     ; ;Printing Bottom Messages 
-    ; mov ah,2                                                              ;x=coloumn y=row
-    ; mov dx,1801h        ;set cursor at bottom left of the screen      ;dl=x=01h,dh=y=18h
-    ; int 10h
+    ; MOV ah,2                                                              ;x=coloumn y=row
+    ; MOV DX,1801h        ;set cursor at bottom left of the screen      ;DL=x=01h,dh=y=18h
+    ; INT 10h
     
-    ; mov ah,9
-    ; mov dx,offset mes4   ;print mes4
-    ; int 21h 
+    ; MOV ah,9
+    ; MOV DX,OFFSET mes4   ;print mes4
+    ; INT 21h 
        
-    ; mov ah,9
-    ; mov dx,offset userName2+2  ;print username ;+2 because first 2 characters are garbage
-    ; int 21h 
+    ; MOV ah,9
+    ; MOV DX,OFFSET userName2+2  ;print username ;+2 because first 2 characters are garbage
+    ; INT 21h 
     
-    ; mov ah,2
-    ; mov dx,1901h        ;set cursor at bottom left of the screen but alittle below 1st one ;dl=x=01h,dh=y=19h
-    ; int 10h
+    ; MOV ah,2
+    ; MOV DX,1901h        ;set cursor at bottom left of the screen but alittle below 1st one ;DL=x=01h,dh=y=19h
+    ; INT 10h
 
-    ; mov ah,9
-    ; mov dx,offset mes5   ;print mes5
-    ; int 21h  
+    ; MOV ah,9
+    ; MOV DX,OFFSET mes5   ;print mes5
+    ; INT 21h  
 
-    ; mov ah,9 
-    ; mov dx,offset userName2+2  ;print username ;+2 because first 2 characters are garbage
-    ; int 21h  
-    ret
-PrintMessages endp
+    ; MOV ah,9 
+    ; MOV DX,OFFSET userName2+2  ;print username ;+2 because first 2 characters are garbage
+    ; INT 21h  
+    RET
+PrintMessages ENDP
 
-AskForUserName proc 
+AskForUserName PROC 
 ;CALL clearscreen
-    mov ah,2
-    mov dx,0C16h     ;Set/Move Cursor to Middle postion
-    int 10h
+    MOV ah,2
+    MOV DX,0C16h     ;Set/Move Cursor to Middle postion
+    INT 10h
     
-    mov ah,9
-    mov dx,offset User_mes1   ;print message
-    int 21h 
+    MOV ah,9
+    MOV DX,OFFSET User_mes1   ;print message
+    INT 21h 
      
     ReEnterName:       
-    mov ah,2
-    mov dx,0D16h      ;Set/Move Cursor to Middle postion (incremented row by 1)
-    int 10h 
+    MOV ah,2
+    MOV DX,0D16h      ;Set/Move Cursor to Middle postion (incremented row by 1)
+    INT 10h 
     
-    mov ah,0Ah         ;Read user name from keyboard
-    mov dx,offset userName1
-    int 21h   
+    MOV ah,0Ah         ;Read user name from keyboard
+    MOV DX,OFFSET userName1
+    INT 21h   
     
-    LEA bx,userName1   ;or mov bx,offset userName   
+    LEA bx,userName1   ;or MOV bx,OFFSET userName   
     
     ;Validation of First Letter  
     
-    mov al,[bx]+2 ;because first byte is F->15
+    MOV al,[bx]+2 ;because first byte is F->15
     CMP al,'A'    ;41h ;if Ascii less than A then its a special character
     JB ReEnterName  
     ;or JC      
     CMP al,'z' ;7Ah
     JA ReEnterName  ;if Ascii greater than z then its a special character
     ;or JNC  
-    mov cl, 96   ;move the character just before "a" to cl 
+    MOV cl, 96   ;move the character just before "a" to cl 
     sub cl, al    ;do cl=cl-al ===> al contains the first letter of user name,,store the difference in cl,,say N"78" was first letter
 
-    cmp cl, 6       ;if difference in cl is smaller than 6, then invalid
+    CMP cl, 6       ;if difference in cl is smaller than 6, then invalid
     JB ReEnterName        ;special characters from 91d to 96d  
     ;or JC
     ;-------------------------------------------------------------other user name
-    mov ah,2
-    mov dx,0E16h     ;Set/Move Cursor to Middle postion
-    int 10h
+    MOV ah,2
+    MOV DX,0E16h     ;Set/Move Cursor to Middle postion
+    INT 10h
     
-    mov ah,9
-    mov dx,offset User_mes2   ;print message
-    int 21h 
+    MOV ah,9
+    MOV DX,OFFSET User_mes2   ;print message
+    INT 21h 
 
     ReEnterName2:       
-    mov ah,2
-    mov dx,0F16h      ;Set/Move Cursor to Middle postion (incremented row by 1)
-    int 10h 
+    MOV ah,2
+    MOV DX,0F16h      ;Set/Move Cursor to Middle postion (incremented row by 1)
+    INT 10h 
     
-    mov ah,0Ah         ;Read user name 2 from keyboard
-    mov dx,offset userName2
-    int 21h   
+    MOV ah,0Ah         ;Read user name 2 from keyboard
+    MOV DX,OFFSET userName2
+    INT 21h   
     
-    LEA bx,userName2  ;or mov bx,offset userName   
+    LEA bx,userName2  ;or MOV bx,OFFSET userName   
     
     ;Validation of First Letter  
     
-    mov al,[bx]+2 ;because first byte is F->15
+    MOV al,[bx]+2 ;because first byte is F->15
     CMP al,'A';41h ;if Ascii less than A then its a special character
     JB ReEnterName2  
         
     CMP al,'z' ;7Ah
     JA ReEnterName2  ;if Ascii greater than z then its a special character
    
-    mov cl, 96   ;move the character just before "a" to cl 
+    MOV cl, 96   ;move the character just before "a" to cl 
     sub cl, al    ;do cl=cl-al ===> al contains the first letter of user name,,store the difference in cl,,say N"78" was first letter
 
-    cmp cl, 6       ;if difference in cl is smaller than 6, then invalid
+    CMP cl, 6       ;if difference in cl is smaller than 6, then invalid
     JB ReEnterName2        ;special characters from 91d to 96d  
     
     ;-------------------------------------------------------
-    mov ah,2
-    mov dx,1016h      ;Set/Move Cursor to Middle postion (increment row by 1)
-    int 10h
+    MOV ah,2
+    MOV DX,1016h      ;Set/Move Cursor to Middle postion (increment row by 1)
+    INT 10h
     
-    mov ah,9
-    mov dx,offset Press_mes2   ;print other message
-    int 21h  
+    MOV ah,9
+    MOV DX,OFFSET Press_mes2   ;print other message
+    INT 21h  
     
     ;Check for a keystroke
     EnterLoop:
-        mov ah,0
-        int 16h      ;get key pressed
-        cmp al, 13d  ;Check the key was Enter
+        MOV ah,0
+        INT 16h      ;get key pressed
+        CMP al, 13d  ;Check the key was Enter
     JNE EnterLoop    ;enter key 0Dh 
-    ret
-AskForUserName endp
+    RET
+AskForUserName ENDP
 ; Draws 8 X 8 Grid with 640 X 350 px of screen dimensions (VIDEO MODE AX = 0010H OR AX = 4F02H, BX = 0100) 
 DRAW_GRID PROC 
 						
 	MOV AH, 0CH ; Draw Pixel Command  
-	MOV AL, 0bh ; grid's Pixel of light aqua color 
+	MOV AL, 0fh ; grid's Pixel of light aqua color 
 	MOV CX, 0 ;Starting ith position 
 	MOV DX, 0 ;Starting jth position 
 	INT 10H
@@ -362,90 +362,90 @@ DRAW_GRID PROC
 
 	ThirdLineoftheSquare:
 	INT 10H
-	dec cx
+	dec CX
 	CMP CX, 0 
 	JNZ ThirdLineoftheSquare   
 
 	FourthLineoftheSquare:
 	INT 10H
-	dec dx
+	dec DX
 	CMP DX, 0 
 	JNZ FourthLineoftheSquare
 
-	mov cx, 80 
-	mov dx, 0
+	MOV CX, 80 
+	MOV DX, 0
 	
-	;mov bx, 344
+	;MOV bx, 344
 	vlone:
-	int 10h
-	inc dx
-	cmp dx, 344
-	jnz vlone
+	INT 10h
+	INC DX
+	CMP DX, 344
+	JNZ vlone
 
-	mov cx, 160
-	mov dx, 0
-	;mov bx, 344
+	MOV CX, 160
+	MOV DX, 0
+	;MOV bx, 344
 	vltwo:
-	int 10h
-	inc dx
-	cmp dx, 344
-	jnz vltwo
+	INT 10h
+	INC DX
+	CMP DX, 344
+	JNZ vltwo
 
-	mov cx, 240
-	mov dx, 0
-	;mov bx, 344
+	MOV CX, 240
+	MOV DX, 0
+	;MOV bx, 344
 	vlthree:
-	int 10h
-	inc dx
-	cmp dx, 344
-	jnz vlthree
+	INT 10h
+	INC DX
+	CMP DX, 344
+	JNZ vlthree
 
-	mov cx, 320
-	mov dx, 0
+	MOV CX, 320
+	MOV DX, 0
 	vlfour:
-	int 10h
-	inc dx
-	cmp dx, 344
-	jnz vlfour      
+	INT 10h
+	INC DX
+	CMP DX, 344
+	JNZ vlfour      
 
-	mov cx, 400
-	mov dx, 0
-	;mov bx, 344
+	MOV CX, 400
+	MOV DX, 0
+	;MOV bx, 344
 	vlfive:
-	int 10h
-	inc dx
-	cmp dx, 344
-	jnz vlfive
+	INT 10h
+	INC DX
+	CMP DX, 344
+	JNZ vlfive
 
-	mov cx, 480
-	mov dx, 0
-	;mov bx, 344
+	MOV CX, 480
+	MOV DX, 0
+	;MOV bx, 344
 	vlsix:
-	int 10h
-	inc dx
-	cmp dx, 344
-	jnz vlsix
+	INT 10h
+	INC DX
+	CMP DX, 344
+	JNZ vlsix
 
-	mov cx, 560
-	mov dx, 0
-	;mov bx, 344
+	MOV CX, 560
+	MOV DX, 0
+	;MOV bx, 344
 	vlseven:
-	int 10h
-	inc dx
-	cmp dx, 344
-	jnz vlseven  
+	INT 10h
+	INC DX
+	CMP DX, 344
+	JNZ vlseven  
 
-	mov cx, 640
-	mov dx, 0
-	;mov bx, 344
+	MOV CX, 640
+	MOV DX, 0
+	;MOV bx, 344
 	vleight:
-	int 10h
-	inc dx
-	cmp dx, 344
-	jnz vleight   
+	INT 10h
+	INC DX
+	CMP DX, 344
+	JNZ vleight   
 
-	mov cx, 0
-	mov dx, 43
+	MOV CX, 0
+	MOV DX, 43
 
 	hlone:
 	INT 10H
@@ -453,8 +453,8 @@ DRAW_GRID PROC
 	CMP CX, 639
 	JNZ hlone
 
-	mov cx, 0
-	mov dx, 86
+	MOV CX, 0
+	MOV DX, 86
 
 	;MOV BX, 320
 	hltwo:
@@ -463,8 +463,8 @@ DRAW_GRID PROC
 	CMP CX, 639
 	JNZ hltwo
 
-	mov cx, 0
-	mov dx, 129
+	MOV CX, 0
+	MOV DX, 129
 
 	;MOV BX, 320
 	hlthree:
@@ -473,8 +473,8 @@ DRAW_GRID PROC
 	CMP CX, 639
 	JNZ hlthree
 
-	mov cx, 0
-	mov dx, 172
+	MOV CX, 0
+	MOV DX, 172
 
 	;MOV BX, 320
 	hlfour:
@@ -483,8 +483,8 @@ DRAW_GRID PROC
 	CMP CX, 639
 	JNZ hlfour
 
-	mov cx, 0
-	mov dx, 215
+	MOV CX, 0
+	MOV DX, 215
 
 	;MOV BX, 320
 	hlfive:
@@ -493,8 +493,8 @@ DRAW_GRID PROC
 	CMP CX, 639 
 	JNZ hlfive
 
-	mov cx, 0
-	mov dx, 258
+	MOV CX, 0
+	MOV DX, 258
 
 	;MOV BX, 320
 	hlsix:
@@ -503,8 +503,8 @@ DRAW_GRID PROC
 	CMP CX, 639
 	JNZ hlsix
 
-	mov cx, 0
-	mov dx, 301
+	MOV CX, 0
+	MOV DX, 301
 
 	;MOV BX, 320
 	hlseven:
@@ -513,8 +513,8 @@ DRAW_GRID PROC
 	CMP CX, 639
 	JNZ hlseven
 
-	mov cx, 0
-	mov dx, 344
+	MOV CX, 0
+	MOV DX, 344
 
 	;MOV BX, 320
 	hleight:
@@ -764,7 +764,7 @@ CHANGE_TO_VIDEO PROC
 	; Change to video mode 640 X 400 X 256
 	MOV AX, 4F02H
     MOV BX, 0100H
-    int 10h        
+    INT 10h        
 	; MOV AH,0Bh 
 	RET
 CHANGE_TO_VIDEO ENDP
@@ -937,18 +937,18 @@ STORE_IMG_RELATIVE PROC
 STORE_IMG_RELATIVE ENDP
 
 RANDGEN PROC
-   ; A procedure which produce a random value in dx 
+   ; A procedure which produce a random value in DX 
    MOV AH, 00h  ; interrupts to get system time        
    INT 1AH      ; CX:DX now hold number of clock ticks since midnight      
 
-   mov  ax, dx
-   xor  dx, dx
-   mov  cx, 10    
-   div  cx       ; here dx contains the remainder of the division - from 0 to 9
+   MOV  ax, DX
+   XOR  DX, DX
+   MOV  CX, 10    
+   DIV  CX       ; here DX contains the remainder of the division - from 0 to 9
    
-   ;add  dl, '0'  ; to ascii from '0' to '9'
-   ;mov ah, 2h   ; call interrupt to display a value in DL
-   ;int 21h    
+   ;add  DL, '0'  ; to ascii from '0' to '9'
+   ;MOV ah, 2h   ; call interrupt to display a value in DL
+   ;INT 21h    
 	RET
 RANDGEN ENDP
     
@@ -957,28 +957,28 @@ DRAW_RAND_BOX MACRO Colour
    ReGenRand1:
 
     call RandGen
-	Mov Ax, 80
-	sub dl, 2
-	Mul dl
-    Sub Ax, 50
+	MOV AX, 80
+	sub DL, 2
+	Mul DL
+    Sub AX, 50
 
-    cmp Ax, 640
+    CMP AX, 640
 	JNC ReGenRand1
 
-    Mov X_RAND_Box, Ax
+    MOV X_RAND_Box, AX
 
     ReGenRand2:
 
     call RandGen
-	Mov Ax, 43
-	add dl, 3 
-    Mul dl
-	sub Ax, 28
+	MOV AX, 43
+	add DL, 3 
+    Mul DL
+	sub AX, 28
 
-	cmp Ax, 350
+	CMP AX, 350
 	JNC ReGenRand2
 
-	Mov Y_RAND_Box, AX
+	MOV Y_RAND_Box, AX
 
 	STORE_BOX  X_RAND_BOX, Y_RAND_Box
 	COMPARE_OBJS TEMP_BOX, BLACKBOX, BOX_PXS
@@ -992,28 +992,28 @@ DRAW_RAND_COIN PROC
 	ReGenRandCoin1:
 
     call RandGen
-	Mov Ax, 80
-	inc dl
-	Mul dl
-    Add Ax, 47
+	MOV AX, 80
+	INC DL
+	Mul DL
+    Add AX, 47
 
-    cmp Ax, 640
+    CMP AX, 640
 	JNC ReGenRandCoin1
 
-    Mov X_RAND_COin, Ax
+    MOV X_RAND_COin, AX
 
     ReGenRandCoin2:
 
     call RandGen
-	Mov Ax, 43 
-	sub dl, 2
-    Mul dl
-	Add Ax, 30
+	MOV AX, 43 
+	sub DL, 2
+    Mul DL
+	Add AX, 30
 
-	cmp Ax, 350
+	CMP AX, 350
 	JNC ReGenRandCoin2
 
-	Mov Y_RAND_Coin, AX
+	MOV Y_RAND_Coin, AX
 
 	STORE_IMG_16 X_RAND_COIN, Y_RAND_COIN
 	COMPARE_OBJS TEMP_IMG_16, BLACKBOX, 256
@@ -1027,28 +1027,28 @@ DRAW_RAND_COIN ENDP
 CONVERT_TO_ASCII MACRO SCORE
 LOCAL next_digit, divide
 	MOV SCORE+4, '0'
-	mov ax, SCORE       ; number to be converted
-    mov cx, 10         	; divisor
-    xor bx, bx          ; count digits
+	MOV ax, SCORE       ; number to be converted
+    MOV CX, 10         	; divisor
+    XOR bx, bx          ; count digits
 
 divide:
-    xor dx, dx        ; high part = 0
-    div cx             ; ax = dx:ax/cx, dx = remainder
-    push dx             ; DL is a digit in range [0..9]
-    inc bx              ; count digits
-    test ax, ax       ; AX is 0?
-    jnz divide          ; no, continue
+    XOR DX, DX        ; high part = 0
+    DIV CX             ; ax = DX:ax/CX, DX = remainder
+    PUSH DX             ; DL is a digit in range [0..9]
+    INC bx              ; count digits
+    TEST ax, ax       ; AX is 0?
+    JNZ divide          ; no, continue
 
     ; POP digits from stack in reverse order
-    mov cx, bx          ; number of digits
+    MOV CX, bx          ; number of digits
 	MOV SCORE+2, BX
-    lea si, SCORE+4   ; DS:SI points to string buffer
+    LEA si, SCORE+4   ; DS:SI points to string buffer
 next_digit:
-    pop ax
+    POP ax
     add al, '0'           ; convert to ASCII
-    mov [SI], AL        ; write it to the buffer
-    inc si
-    loop next_digit
+    MOV [SI], AL        ; write it to the buffer
+    INC si
+    LOOP next_digit
 ENDM CONVERT_TO_ASCII
 
 DISPLAY_STATUS MACRO X, Y, LEN, MSG
@@ -1057,7 +1057,7 @@ DISPLAY_STATUS MACRO X, Y, LEN, MSG
     MOV CX,LEN 						;Length of the string to be printed 
     MOV DH,Y 						;Y coordinate
     MOV DL,X 						;X coordinate
-    MOV BP,OFFSET MSG 		;Moves to bp the offset of the string
+    MOV BP,OFFSET MSG 		;Moves to bp the OFFSET of the string
     INT 10H
 ENDM DISPLAY_STATUS
 
@@ -1067,7 +1067,7 @@ CLEAR_STATUS MACRO X, Y, LEN, MSG
     MOV CX,LEN 						;Length of the string to be printed 
     MOV DH,Y 						;Y coordinate
     MOV DL,X 						;X coordinate
-    MOV BP,OFFSET MSG 		;Moves to bp the offset of the string
+    MOV BP,OFFSET MSG 		;Moves to bp the OFFSET of the string
     INT 10H
 ENDM CLEAR_STATUS
 
@@ -1126,25 +1126,25 @@ LOCAL TERMINATE, Calc_2, GetMax, GetMax2
 	JNE CALC_2
 
 
-	cmp SCORE_P1, 85
+	CMP SCORE_P1, 85
     JGE GETMAX
 
     ADD SCORE_P1, 15
 	JMP TERMINATE
 
     GetMax:
-	Mov Score_P1, 100
+	MOV Score_P1, 100
 	JMP TERMINATE
 
 CALC_2: 
-	cmp SCORE_P2, 85
+	CMP SCORE_P2, 85
     JGE GetMax2
 
 	ADD SCORE_P2, 15
 	JMP Terminate
 
 	GetMax2: 
-	Mov Score_P2, 100
+	MOV Score_P2, 100
 TERMINATE: 
 ENDM YELLOW_BOX_EFFECT
 
@@ -1175,7 +1175,7 @@ LOCAL TERMINATE, Calc_2, Reset, Reset2
     SUB SCORE_P2, 20
 	JMP TERMINATE
 Reset: 
-    Mov Score_P2, 0
+    MOV Score_P2, 0
 	JMP TERMINATE
 
 CALC_2: 
@@ -1183,10 +1183,10 @@ CALC_2:
 	JL Reset2
 
 	SUB SCORE_P1, 20
-    Jmp Terminate
+    JMP Terminate
 
 	Reset2: 
-	Mov Score_P1, 0
+	MOV Score_P1, 0
 TERMINATE: 
 ENDM GREEN_BOX_EFFECT
 
@@ -1301,7 +1301,7 @@ YELLOW:
 	JMP TERMINATE
 
     GETMAX:
-	Mov Score_P1, 100
+	MOV Score_P1, 100
 	JMP TERMINATE
 
 	CALC_2: 
@@ -1312,7 +1312,7 @@ YELLOW:
 	JMP Terminate
 
 	GETMAX2: 
-	Mov Score_P2, 100
+	MOV Score_P2, 100
 	JMP TERMINATE
 		
 GREEN:
@@ -1331,7 +1331,7 @@ GREEN:
 	JMP TERMINATE
 
 	RESET: 
-    Mov Score_P2, 0
+    MOV Score_P2, 0
 	JMP TERMINATE
 
 	CALC: 
@@ -1339,10 +1339,10 @@ GREEN:
 	JL Reset2
 
 	SUB SCORE_P1, 20
-    Jmp Terminate
+    JMP Terminate
 
 	RESET2: 
-	Mov Score_P1, 0
+	MOV Score_P1, 0
 	JMP TERMINATE
 
 TERMINATE:
@@ -1544,23 +1544,23 @@ LOCAL TERMINATE, Calc_2, Win1, Win2
 	CMP SI, Y_POS
 	JNE CALC_2
 
-    cmp Score_P1, 99
+    CMP Score_P1, 99
 	JGE Win1
     INC SCORE_P1 
-	Jmp Terminate
+	JMP Terminate
 Win1: 
-    Mov Score_P1, 100 
+    MOV Score_P1, 100 
 	JMP TERMINATE
 
 CALC_2: 
 
-    cmp Score_P2, 99
+    CMP Score_P2, 99
 	JGE Win2
 
 	INC SCORE_P2
-	Jmp Terminate
+	JMP Terminate
 Win2: 
-    Mov Score_P2,100
+    MOV Score_P2,100
 
 TERMINATE: 
 ENDM COIN_EFFECT
@@ -1587,7 +1587,7 @@ DISPLAY_SCORE_P1 PROC
 
 	CONVERT_TO_ASCII SCORE_P1
 	MOV AX, 1300H
-	Mov CX, 2
+	MOV CX, 2
 	MOV BH,0 				; Page number = zero (always)
     MOV BL,0FH 				; White color
 	MOV DH,22 				; Y coordinate
@@ -1600,7 +1600,7 @@ DISPLAY_SCORE_P1 ENDP
 DISPLAY_SCORE_P2 PROC
 	CONVERT_TO_ASCII SCORE_P2
 	MOV AX, 1300H
-	Mov cx, 2
+	MOV CX, 2
 	MOV BH,0 				; Page number = zero (always)
     MOV BL,0FH 				; White color
 	MOV DH,22 				; Y coordinate
@@ -1678,11 +1678,11 @@ MAIN PROC FAR
    	call PrintMessages 
 
     OptionLoop:
-	mov ah,0
-    int 16h            ;get key pressed
-    cmp al,27d        ;Check the key was ESC
+	MOV ah,0
+    INT 16h            ;get key pressed
+    CMP al,27d        ;Check the key was ESC
     JE END_PROGRAM      ;ESC key 27d or 1Bh  ;ascii check al
-    cmp ah,60       ;Check the key was F2 (scancode ah)
+    CMP ah,60       ;Check the key was F2 (scancode ah)
     JE StartGame
     JNE OptionLoop
 
@@ -1743,7 +1743,7 @@ MAIN PROC FAR
 	DRAW_COIN 607, 159
 
 
-; Infinite loop that lets the user move players all around the grid
+; Infinite LOOP that lets the user move players all around the grid
 	INFINITE:
 		CALL DISPLAY_SCORE_P1
 		CALL DISPLAY_SCORE_P2
@@ -2070,9 +2070,9 @@ END_GAME:
 	DISPLAY_STATUS 32, 12, 13, WIN_MSG1
 
 END_PROGRAM:
-; mov  ah,0
-; mov  al,3
-; int  10h
+; MOV  ah,0
+; MOV  al,3
+; INT  10h
 ; MOV AH,04CH
 ; INT 21H     ;EXIT TO DOS
 HLT

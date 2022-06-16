@@ -1,4 +1,4 @@
-# MineField
+# Mine-Field
 Mine Field is a classic 2D game of 2 players seek to earn more coins in a grid mined with bombs and other special power-ups that randomly occur during the game. This game is developed entirly using x86 Assembly instructions.
 
 ## Setup
